@@ -159,7 +159,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                 onChange={(e) => setNote(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all resize-none"
                 rows={3}
-                placeholder="Ex: Entrega para hoje, sem cebola..."
+                placeholder="Ex: Entregar até 18h, incluir cartão de felicitações..."
               />
             </div>
 
