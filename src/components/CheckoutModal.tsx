@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, MessageCircle } from 'lucide-react';
+import { X, MessageCircle, Home, Store } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { api } from '../services/api';
 import { useToast } from '../hooks/useToast';
@@ -16,6 +16,8 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
+  const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,6 +25,11 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
 
     if (!customerName.trim() || !phone.trim()) {
       showToast('Por favor, preencha seu nome e telefone', 'error');
+      return;
+    }
+
+    if (deliveryMethod === 'delivery' && !address.trim()) {
+      showToast('Por favor, preencha o endereço de entrega', 'error');
       return;
     }
 
@@ -38,6 +45,8 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
         customerName: customerName.trim(),
         phone: phone.trim(),
         note: note.trim(),
+        deliveryMethod,
+        address: deliveryMethod === 'delivery' ? address.trim() : undefined,
         items: items.map(item => ({
           productId: item.product.id,
           qty: item.quantity
@@ -69,6 +78,8 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
       setCustomerName('');
       setPhone('');
       setNote('');
+      setAddress('');
+      setDeliveryMethod('delivery');
 
       showToast('Pedido enviado! Redirecionando para WhatsApp...', 'success');
 
@@ -149,6 +160,56 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                 required
               />
             </div>
+
+            {/* Método de Entrega */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
+                Método de Entrega *
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryMethod('delivery')}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+                    deliveryMethod === 'delivery'
+                      ? 'border-[rgb(254,0,0)] bg-red-50 text-[rgb(254,0,0)]'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Home className="w-5 h-5" />
+                  <span className="font-semibold">Entrega</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryMethod('pickup')}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+                    deliveryMethod === 'pickup'
+                      ? 'border-[rgb(254,0,0)] bg-red-50 text-[rgb(254,0,0)]'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Store className="w-5 h-5" />
+                  <span className="font-semibold">Retirar</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Campo de Endereço - Apenas para entrega */}
+            {deliveryMethod === 'delivery' && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Endereço de Entrega *
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all"
+                  placeholder="Rua, número, bairro, cidade"
+                  required={deliveryMethod === 'delivery'}
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">

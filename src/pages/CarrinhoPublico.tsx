@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ShoppingBag, User, Phone, FileText, Calendar } from 'lucide-react';
+import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store } from 'lucide-react';
 import { api } from '../services/api';
 import { Cart } from '../types';
 import Loading from '../components/Loading';
@@ -98,6 +98,30 @@ export default function CarrinhoPublico() {
                 <p className="font-semibold text-gray-900">{cart.phone}</p>
               </div>
             </div>
+
+            <div className="flex items-start gap-3">
+              {cart.deliveryMethod === 'delivery' ? (
+                <Home className="w-5 h-5 text-gray-600 mt-0.5" />
+              ) : (
+                <Store className="w-5 h-5 text-gray-600 mt-0.5" />
+              )}
+              <div>
+                <p className="text-sm text-gray-600">Método de Entrega</p>
+                <p className="font-semibold text-gray-900">
+                  {cart.deliveryMethod === 'delivery' ? 'Entrega em casa' : 'Retirar no estabelecimento'}
+                </p>
+              </div>
+            </div>
+
+            {cart.deliveryMethod === 'delivery' && cart.address && (
+              <div className="flex items-start gap-3">
+                <Home className="w-5 h-5 text-gray-600 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-600">Endereço de Entrega</p>
+                  <p className="font-semibold text-gray-900">{cart.address}</p>
+                </div>
+              </div>
+            )}
 
             {cart.note && (
               <div className="flex items-start gap-3 md:col-span-2">

@@ -43,6 +43,8 @@ export interface Cart {
   customerName: string;
   phone: string;
   note?: string;
+  deliveryMethod: 'delivery' | 'pickup';
+  address?: string;
   items: CartItemResponse[];
   createdAt: string;
   updatedAt: string;
@@ -52,6 +54,8 @@ export interface CreateCartPayload {
   customerName: string;
   phone: string;
   note?: string;
+  deliveryMethod: 'delivery' | 'pickup';
+  address?: string;
   items: CartItem[];
 }
 
