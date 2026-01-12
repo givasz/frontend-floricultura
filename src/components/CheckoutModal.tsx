@@ -115,7 +115,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
       const response = await api.createCart(cartData);
 
       // Depois, finalizar o carrinho com os dados de pagamento
-      await api.finalizeCart(response.uid, {
+      const finalizeResp = await api.finalizeCart(response.uid, {
         paymentMethod: paymentMethod as 'pix' | 'credit_card' | 'debit_card' | 'cash',
         needsChange: paymentMethod === 'cash' ? needsChange : undefined,
         changeFor: paymentMethod === 'cash' && needsChange ? parseFloat(changeFor) : undefined,
@@ -124,22 +124,28 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
       });
 
       const whatsappNumber = '5598983078865';
-      let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
-      message += `📦 *Pedido de ${customerName.trim()}*\n\n`;
 
-      // Adicionar cada produto com quantidade e preço
-      items.forEach(item => {
-        const itemTotal = (item.product.price * item.quantity).toFixed(2).replace('.', ',');
-        message += `• ${item.quantity}x ${item.product.name} - R$ ${itemTotal}\n`;
-      });
+      if (finalizeResp.whatsappLink) {
+        window.open(finalizeResp.whatsappLink, '_blank');
+      } else {
+        let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
+        message += `📦 *Pedido de ${customerName.trim()}*\n\n`;
 
-      message += `\n💰 *Total: R$ ${getTotalPrice().toFixed(2).replace('.', ',')}*\n\n`;
-      message += `Link completo do pedido:\n${response.link}`;
+        // Adicionar cada produto com quantidade e preço
+        items.forEach(item => {
+          const itemTotal = (item.product.price * item.quantity).toFixed(2).replace('.', ',');
+          message += `• ${item.quantity}x ${item.product.name} - R$ ${itemTotal}\n`;
+        });
 
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        message += `\n💰 *Total: R$ ${getTotalPrice().toFixed(2).replace('.', ',')}*\n\n`;
+        const linkToUse = finalizeResp.link || response.link;
+        message += `Link completo do pedido:\n${linkToUse}`;
 
-      // Abrir WhatsApp
-      window.open(whatsappUrl, '_blank');
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+        // Abrir WhatsApp
+        window.open(whatsappUrl, '_blank');
+      }
 
       // Limpar carrinho e formulário
       clearCart();
