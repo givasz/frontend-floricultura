@@ -3,6 +3,8 @@ import { X, MessageCircle, Home, Store } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { api } from '../services/api';
 import { useToast } from '../hooks/useToast';
+import { PaymentMethodSelector } from './checkout/PaymentMethodSelector';
+import { RecipientInfoForm } from './checkout/RecipientInfoForm';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -20,9 +22,27 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Novos campos de pagamento e destinatário
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'debit_card' | 'cash' | ''>('');
+  const [needsChange, setNeedsChange] = useState(false);
+  const [changeFor, setChangeFor] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
+
+  // Erros de validação
+  const [paymentError, setPaymentError] = useState('');
+  const [recipientNameError, setRecipientNameError] = useState('');
+  const [recipientPhoneError, setRecipientPhoneError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Limpar erros anteriores
+    setPaymentError('');
+    setRecipientNameError('');
+    setRecipientPhoneError('');
+
+    // Validações básicas
     if (!customerName.trim() || !phone.trim()) {
       showToast('Por favor, preencha seu nome e telefone', 'error');
       return;
@@ -38,9 +58,48 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
       return;
     }
 
+    // Validações dos novos campos
+    let hasError = false;
+
+    if (!paymentMethod) {
+      setPaymentError('Selecione uma forma de pagamento');
+      hasError = true;
+    }
+
+    if (!recipientName.trim()) {
+      setRecipientNameError('Nome do destinatário é obrigatório');
+      hasError = true;
+    }
+
+    if (!recipientPhone.trim()) {
+      setRecipientPhoneError('Telefone do destinatário é obrigatório');
+      hasError = true;
+    } else if (recipientPhone.replace(/\D/g, '').length < 11) {
+      setRecipientPhoneError('Telefone inválido. Use o formato (11) 91234-5678');
+      hasError = true;
+    }
+
+    if (paymentMethod === 'cash' && needsChange) {
+      const changeValue = parseFloat(changeFor);
+      const total = getTotalPrice();
+      if (!changeFor || isNaN(changeValue)) {
+        showToast('Informe o valor do troco', 'error');
+        hasError = true;
+      } else if (changeValue < total) {
+        showToast(`O valor do troco não pode ser menor que o total (R$ ${total.toFixed(2)})`, 'error');
+        hasError = true;
+      }
+    }
+
+    if (hasError) {
+      showToast('Por favor, corrija os erros no formulário', 'error');
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Primeiro, criar o carrinho
       const cartData = {
         customerName: customerName.trim(),
         phone: phone.trim(),
@@ -54,6 +113,15 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
       };
 
       const response = await api.createCart(cartData);
+
+      // Depois, finalizar o carrinho com os dados de pagamento
+      await api.finalizeCart(response.uid, {
+        paymentMethod: paymentMethod as 'pix' | 'credit_card' | 'debit_card' | 'cash',
+        needsChange: paymentMethod === 'cash' ? needsChange : undefined,
+        changeFor: paymentMethod === 'cash' && needsChange ? parseFloat(changeFor) : undefined,
+        recipientName: recipientName.trim(),
+        recipientPhone: recipientPhone.trim()
+      });
 
       const whatsappNumber = '5598983078865';
       let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
@@ -80,6 +148,11 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
       setNote('');
       setAddress('');
       setDeliveryMethod('delivery');
+      setPaymentMethod('');
+      setNeedsChange(false);
+      setChangeFor('');
+      setRecipientName('');
+      setRecipientPhone('');
 
       showToast('Pedido enviado! Redirecionando para WhatsApp...', 'success');
 
@@ -221,6 +294,46 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all resize-none"
                 rows={3}
                 placeholder="Ex: Entregar até 18h, incluir cartão de felicitações..."
+              />
+            </div>
+
+            {/* Separador */}
+            <div className="border-t border-gray-200 pt-5">
+              {/* Forma de Pagamento */}
+              <PaymentMethodSelector
+                value={paymentMethod}
+                onChange={(method) => {
+                  setPaymentMethod(method);
+                  setPaymentError('');
+                  if (method !== 'cash') {
+                    setNeedsChange(false);
+                    setChangeFor('');
+                  }
+                }}
+                needsChange={needsChange}
+                onNeedsChangeToggle={setNeedsChange}
+                changeFor={changeFor}
+                onChangeForInput={setChangeFor}
+                cartTotal={getTotalPrice()}
+                error={paymentError}
+              />
+            </div>
+
+            {/* Informações do Destinatário */}
+            <div className="border-t border-gray-200 pt-5">
+              <RecipientInfoForm
+                recipientName={recipientName}
+                onRecipientNameChange={(value) => {
+                  setRecipientName(value);
+                  setRecipientNameError('');
+                }}
+                recipientPhone={recipientPhone}
+                onRecipientPhoneChange={(value) => {
+                  setRecipientPhone(value);
+                  setRecipientPhoneError('');
+                }}
+                nameError={recipientNameError}
+                phoneError={recipientPhoneError}
               />
             </div>
 

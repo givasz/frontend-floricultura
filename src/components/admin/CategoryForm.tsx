@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Category } from '../../types';
+import ImageUpload from './ImageUpload';
 
 interface CategoryFormProps {
   category?: Category;
@@ -57,30 +58,12 @@ export default function CategoryForm({ category, onSubmit, onClose }: CategoryFo
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              URL da Imagem (opcional)
-            </label>
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
-              placeholder="https://exemplo.com/imagem.jpg"
-            />
-            {imageUrl && (
-              <div className="mt-2">
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  className="w-20 h-20 object-cover rounded-lg border border-gray-200"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              </div>
-            )}
-          </div>
+          <ImageUpload
+            currentImageUrl={imageUrl}
+            onImageUrlChange={setImageUrl}
+            uploadEndpoint="categories"
+            label="Imagem da Categoria (opcional)"
+          />
 
           <div className="flex gap-3 pt-4">
             <button

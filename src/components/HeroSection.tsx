@@ -1,13 +1,40 @@
+import { useState, useEffect } from 'react';
 import { ShoppingBag, MessageCircle } from 'lucide-react';
+import { api } from '../services/api';
+
+const HERO_IMAGE_CACHE_KEY = 'hero_image_url';
+const DEFAULT_IMAGE = 'https://storage.lucasmendes.dev/site-sp/giovannaflores%2Fhero2.webp';
 
 export default function HeroSection() {
+  // Tenta carregar do cache primeiro, senão usa a padrão
+  const [heroImageUrl, setHeroImageUrl] = useState(() => {
+    const cached = localStorage.getItem(HERO_IMAGE_CACHE_KEY);
+    return cached || DEFAULT_IMAGE;
+  });
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const config = await api.getSiteConfig();
+        setHeroImageUrl(config.heroImageUrl);
+        // Salva no cache para próximas visitas
+        localStorage.setItem(HERO_IMAGE_CACHE_KEY, config.heroImageUrl);
+      } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+        // Mantém a imagem do cache ou padrão em caso de erro
+      }
+    };
+
+    loadConfig();
+  }, []);
+
   return (
     <section id="hero" className="relative min-h-[85vh] sm:min-h-[90vh] lg:min-h-screen flex items-center justify-center text-white overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url(https://storage.lucasmendes.dev/site-sp/giovannaflores%2Fhero2.webp)',
+          backgroundImage: `url(${heroImageUrl})`,
           backgroundAttachment: 'fixed'
         }}
       />

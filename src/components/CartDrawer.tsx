@@ -1,7 +1,6 @@
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { useState } from 'react';
-import CheckoutModal from './CheckoutModal';
+import { useNavigate } from 'react-router-dom';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -10,11 +9,12 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
-  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleCheckout = () => {
     if (items.length === 0) return;
-    setShowCheckoutModal(true);
+    onClose();
+    navigate('/checkout');
   };
 
   return (
@@ -175,15 +175,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           )}
         </div>
       </div>
-
-      {/* Modal de Checkout */}
-      {showCheckoutModal && (
-        <CheckoutModal
-          isOpen={showCheckoutModal}
-          onClose={() => setShowCheckoutModal(false)}
-          onSuccess={onClose}
-        />
-      )}
     </>
   );
 }

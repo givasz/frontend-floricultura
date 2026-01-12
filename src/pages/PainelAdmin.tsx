@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
-import { LogOut, Package, FolderOpen, ShoppingCart, Edit, Trash2, Plus, ExternalLink } from 'lucide-react';
+import { LogOut, Package, FolderOpen, ShoppingCart, Edit, Trash2, Plus, ExternalLink, Settings, Images } from 'lucide-react';
 import { api } from '../services/api';
-import { Product, Category, Cart, Pagination as PaginationType } from '../types';
+import { Product, Category, Cart, Pagination as PaginationType, SiteConfig } from '../types';
 import { useToast } from '../hooks/useToast';
 import AdminLogin from '../components/admin/AdminLogin';
 import ProductForm from '../components/admin/ProductForm';
 import CategoryForm from '../components/admin/CategoryForm';
+import ProductImagesModal from '../components/admin/ProductImagesModal';
 import Loading from '../components/Loading';
 import Pagination from '../components/Pagination';
 
 export default function PainelAdmin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'carts'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'carts' | 'config'>('products');
   const { showToast, ToastComponent } = useToast();
 
   // Estados para produtos
@@ -58,6 +59,13 @@ export default function PainelAdmin() {
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+  const [showProductImages, setShowProductImages] = useState(false);
+  const [managingImagesProduct, setManagingImagesProduct] = useState<Product | undefined>();
+
+  // Estados para configurações
+  const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(false);
+  const [heroImageUrl, setHeroImageUrl] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -73,13 +81,15 @@ export default function PainelAdmin() {
         loadProducts();
       } else if (activeTab === 'carts') {
         loadCarts();
+      } else if (activeTab === 'config') {
+        loadConfig();
       }
     }
   }, [isAuthenticated, activeTab, productsPage, categoriesPage, cartsPage]);
 
   const handleLogin = async (username: string, password: string) => {
     // Validar credenciais localmente primeiro
-    if (username !== 'admin' || password !== 'flordemaio40') {
+    if (username !== 'admin' || password !== 'admin123') {
       throw new Error('Credenciais inválidas');
     }
 
@@ -239,6 +249,37 @@ export default function PainelAdmin() {
     setCartsPage(page);
   };
 
+  // Funções de Configurações
+  const loadConfig = async () => {
+    setLoadingConfig(true);
+    try {
+      const config = await api.getSiteConfig();
+      setSiteConfig(config);
+      setHeroImageUrl(config.heroImageUrl);
+    } catch (error) {
+      showToast('Erro ao carregar configurações', 'error');
+    } finally {
+      setLoadingConfig(false);
+    }
+  };
+
+  const handleUpdateConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!heroImageUrl.trim()) {
+      showToast('URL da imagem é obrigatória', 'error');
+      return;
+    }
+
+    try {
+      await api.admin.updateSiteConfig({ heroImageUrl });
+      showToast('Configurações atualizadas com sucesso!', 'success');
+      loadConfig();
+    } catch (error) {
+      showToast('Erro ao atualizar configurações', 'error');
+    }
+  };
+
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;
   }
@@ -302,6 +343,17 @@ export default function PainelAdmin() {
               <ShoppingCart className="w-5 h-5" />
               Carrinhos
             </button>
+            <button
+              onClick={() => setActiveTab('config')}
+              className={`flex items-center gap-2 px-4 py-4 border-b-2 font-medium transition-colors ${
+                activeTab === 'config'
+                  ? 'border-[rgb(254,0,0)] text-[rgb(254,0,0)]'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Settings className="w-5 h-5" />
+              Configurações
+            </button>
           </div>
         </div>
       </div>
@@ -352,8 +404,21 @@ export default function PainelAdmin() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           R$ {product.price.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {product.category?.name}
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="flex flex-wrap gap-1">
+                            {product.categories && product.categories.length > 0 ? (
+                              product.categories.map((pc) => (
+                                <span
+                                  key={pc.id}
+                                  className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium"
+                                >
+                                  {pc.category.name}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-gray-400 italic">Sem categoria</span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
@@ -370,16 +435,28 @@ export default function PainelAdmin() {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => {
+                              setManagingImagesProduct(product);
+                              setShowProductImages(true);
+                            }}
+                            className="text-purple-600 hover:text-purple-900 mr-3"
+                            title="Gerenciar imagens"
+                          >
+                            <Images className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => {
                               setEditingProduct(product);
                               setShowProductForm(true);
                             }}
                             className="text-blue-600 hover:text-blue-900 mr-3"
+                            title="Editar produto"
                           >
                             <Edit className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() => handleDeleteProduct(product.id)}
                             className="text-red-600 hover:text-red-900"
+                            title="Deletar produto"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
@@ -518,6 +595,70 @@ export default function PainelAdmin() {
             )}
           </div>
         )}
+
+        {/* Tab: Configurações */}
+        {activeTab === 'config' && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Configurações do Site</h2>
+
+            {loadingConfig ? (
+              <Loading />
+            ) : (
+              <div className="bg-white rounded-xl shadow p-6">
+                <form onSubmit={handleUpdateConfig} className="space-y-6">
+                  {/* Hero Image URL */}
+                  <div>
+                    <label htmlFor="heroImageUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                      URL da Imagem de Fundo da Hero
+                    </label>
+                    <input
+                      type="url"
+                      id="heroImageUrl"
+                      value={heroImageUrl}
+                      onChange={(e) => setHeroImageUrl(e.target.value)}
+                      placeholder="https://exemplo.com/imagem.jpg"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
+                      required
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Esta imagem aparecerá como fundo da seção Hero na página inicial (onde está escrito "40 Anos Encantando São Luís...")
+                    </p>
+                  </div>
+
+                  {/* Preview */}
+                  {heroImageUrl && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Prévia da Imagem
+                      </label>
+                      <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-300">
+                        <img
+                          src={heroImageUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '';
+                            e.currentTarget.alt = 'Erro ao carregar imagem';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors font-medium"
+                    >
+                      Salvar Configurações
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modals */}
@@ -540,6 +681,19 @@ export default function PainelAdmin() {
           onClose={() => {
             setShowCategoryForm(false);
             setEditingCategory(undefined);
+          }}
+        />
+      )}
+
+      {showProductImages && managingImagesProduct && (
+        <ProductImagesModal
+          product={managingImagesProduct}
+          onClose={() => {
+            setShowProductImages(false);
+            setManagingImagesProduct(undefined);
+          }}
+          onUpdate={() => {
+            loadProducts();
           }}
         />
       )}

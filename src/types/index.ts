@@ -7,6 +7,14 @@ export interface Category {
   updatedAt: string;
 }
 
+export interface ProductImage {
+  id: number;
+  productId: number;
+  imageUrl: string;
+  order: number;
+  createdAt: string;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -16,6 +24,7 @@ export interface Product {
   active: boolean;
   categoryId: number;
   category?: Category;
+  images?: ProductImage[];
   createdAt: string;
   updatedAt: string;
 }
@@ -78,4 +87,12 @@ export interface Pagination {
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: Pagination;
+}
+
+// Configurações do site
+export interface SiteConfig {
+  id: number;
+  heroImageUrl: string;
+  createdAt: string;
+  updatedAt: string;
 }

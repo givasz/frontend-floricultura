@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store } from 'lucide-react';
+import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store, CreditCard, Banknote, Users } from 'lucide-react';
 import { api } from '../services/api';
 import { Cart } from '../types';
 import Loading from '../components/Loading';
@@ -148,6 +148,45 @@ export default function CarrinhoPublico() {
                 </p>
               </div>
             </div>
+
+            {/* Forma de Pagamento */}
+            {cart.paymentMethod && (
+              <div className="flex items-start gap-3">
+                {cart.paymentMethod === 'cash' ? (
+                  <Banknote className="w-5 h-5 text-gray-600 mt-0.5" />
+                ) : (
+                  <CreditCard className="w-5 h-5 text-gray-600 mt-0.5" />
+                )}
+                <div>
+                  <p className="text-sm text-gray-600">Forma de Pagamento</p>
+                  <p className="font-semibold text-gray-900">
+                    {cart.paymentMethod === 'pix' && 'PIX'}
+                    {cart.paymentMethod === 'credit_card' && 'Cartão de Crédito'}
+                    {cart.paymentMethod === 'debit_card' && 'Cartão de Débito'}
+                    {cart.paymentMethod === 'cash' && 'Dinheiro'}
+                  </p>
+                  {cart.paymentMethod === 'cash' && cart.needsChange && cart.changeFor && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      Troco para: <span className="font-semibold text-gray-900">R$ {cart.changeFor.toFixed(2).replace('.', ',')}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Destinatário */}
+            {cart.recipientName && (
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-gray-600 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-600">Destinatário</p>
+                  <p className="font-semibold text-gray-900">{cart.recipientName}</p>
+                  {cart.recipientPhone && (
+                    <p className="text-sm text-gray-600 mt-1">{cart.recipientPhone}</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -1,6 +1,16 @@
-import { Product, Category, CreateCartPayload, CreateCartResponse, Cart, PaginatedResponse } from '../types';
+import { Product, Category, CreateCartPayload, CreateCartResponse, Cart, PaginatedResponse, SiteConfig } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Garantir que a URL sempre tenha protocolo
+const getApiUrl = () => {
+  const url = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  // Se a URL não começar com http:// ou https://, adicionar https://
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+  return url;
+};
+
+const API_URL = getApiUrl();
 
 export const api = {
   getProducts: async (filters: { category?: string; active?: string; page?: number; limit?: number } = {}): Promise<PaginatedResponse<Product>> => {
@@ -11,7 +21,11 @@ export const api = {
     if (filters.limit) params.append('limit', filters.limit.toString());
 
     const res = await fetch(`${API_URL}/products?${params}`);
-    if (!res.ok) throw new Error('Erro ao buscar produtos');
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+      console.error('Erro ao buscar produtos:', error);
+      throw new Error(error.error || 'Erro ao buscar produtos');
+    }
     return res.json();
   },
 
@@ -49,11 +63,44 @@ export const api = {
     return res.json();
   },
 
+  finalizeCart: async (uid: string, finalizationData: {
+    paymentMethod: 'pix' | 'credit_card' | 'debit_card' | 'cash';
+    needsChange?: boolean;
+    changeFor?: number;
+    recipientName: string;
+    recipientPhone: string;
+  }): Promise<void> => {
+    const res = await fetch(`${API_URL}/carrinho/${uid}/finalize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(finalizationData)
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: 'Erro ao finalizar carrinho' }));
+      console.error('Erro ao finalizar carrinho:', error);
+      throw new Error(error.error || 'Erro ao finalizar carrinho');
+    }
+  },
+
+  // Configurações do site
+  getSiteConfig: async (): Promise<SiteConfig> => {
+    const res = await fetch(`${API_URL}/config`);
+    if (!res.ok) throw new Error('Erro ao buscar configurações');
+    return res.json();
+  },
+
   admin: {
     getHeaders: () => {
       const token = localStorage.getItem("adminToken");
       return {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      };
+    },
+
+    getAuthHeaders: () => {
+      const token = localStorage.getItem("adminToken");
+      return {
         "Authorization": `Bearer ${token}`
       };
     },
@@ -132,6 +179,163 @@ export const api = {
         headers: api.admin.getHeaders()
       });
       if (!res.ok) throw new Error('Erro ao buscar carrinhos');
+      return res.json();
+    },
+
+    updateSiteConfig: async (config: { heroImageUrl: string }): Promise<SiteConfig> => {
+      const res = await fetch(`${API_URL}/config`, {
+        method: "PUT",
+        headers: api.admin.getHeaders(),
+        body: JSON.stringify(config)
+      });
+      if (!res.ok) throw new Error('Erro ao atualizar configurações');
+      return res.json();
+    },
+
+    // Upload de imagens
+    uploadProductImage: async (file: File): Promise<{ imageUrl: string }> => {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await fetch(`${API_URL}/products/upload-image`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao enviar imagem');
+      }
+      return res.json();
+    },
+
+    uploadCategoryImage: async (file: File): Promise<{ imageUrl: string }> => {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await fetch(`${API_URL}/categories/upload-image`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao enviar imagem');
+      }
+      return res.json();
+    },
+
+    createProductWithImage: async (formData: FormData): Promise<Product> => {
+      const res = await fetch(`${API_URL}/products/with-image`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao criar produto');
+      }
+      return res.json();
+    },
+
+    updateProductWithImage: async (id: number, formData: FormData): Promise<Product> => {
+      const res = await fetch(`${API_URL}/products/${id}/with-image`, {
+        method: "PUT",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao atualizar produto');
+      }
+      return res.json();
+    },
+
+    createCategoryWithImage: async (formData: FormData): Promise<Category> => {
+      const res = await fetch(`${API_URL}/categories/with-image`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao criar categoria');
+      }
+      return res.json();
+    },
+
+    updateCategoryWithImage: async (id: number, formData: FormData): Promise<Category> => {
+      const res = await fetch(`${API_URL}/categories/${id}/with-image`, {
+        method: "PUT",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao atualizar categoria');
+      }
+      return res.json();
+    },
+
+    // Múltiplas imagens por produto
+    getProductImages: async (productId: number) => {
+      const res = await fetch(`${API_URL}/products/${productId}/images`);
+      if (!res.ok) throw new Error('Erro ao buscar imagens do produto');
+      return res.json();
+    },
+
+    addProductImage: async (productId: number, file: File, order?: number) => {
+      const formData = new FormData();
+      formData.append('image', file);
+      if (order !== undefined) {
+        formData.append('order', order.toString());
+      }
+
+      const res = await fetch(`${API_URL}/products/${productId}/images`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao adicionar imagem');
+      }
+      return res.json();
+    },
+
+    addMultipleProductImages: async (productId: number, files: File[]) => {
+      const formData = new FormData();
+      files.forEach(file => {
+        formData.append('images', file);
+      });
+
+      const res = await fetch(`${API_URL}/products/${productId}/images/multiple`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao adicionar imagens');
+      }
+      return res.json();
+    },
+
+    deleteProductImage: async (productId: number, imageId: number) => {
+      const res = await fetch(`${API_URL}/products/${productId}/images/${imageId}`, {
+        method: "DELETE",
+        headers: api.admin.getAuthHeaders()
+      });
+      if (!res.ok) throw new Error('Erro ao deletar imagem');
+    },
+
+    reorderProductImages: async (productId: number, images: { id: number; order: number }[]) => {
+      const res = await fetch(`${API_URL}/products/${productId}/images/reorder`, {
+        method: "PUT",
+        headers: api.admin.getHeaders(),
+        body: JSON.stringify({ images })
+      });
+      if (!res.ok) throw new Error('Erro ao reordenar imagens');
       return res.json();
     }
   }

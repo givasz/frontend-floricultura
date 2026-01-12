@@ -6,6 +6,7 @@ import { Product, Category, Pagination as PaginationType } from '../types';
 import { useCart } from '../contexts/CartContext';
 import Loading from '../components/Loading';
 import Pagination from '../components/Pagination';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function Produtos() {
   const [searchParams] = useSearchParams();
@@ -162,7 +163,7 @@ export default function Produtos() {
                     {/* Imagem */}
                     <div className="relative aspect-square overflow-hidden bg-gray-100">
                       <img
-                        src={product.imageUrl}
+                        src={getImageUrl(product.imageUrl)}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
@@ -178,6 +179,20 @@ export default function Produtos() {
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                         {product.description}
                       </p>
+
+                      {/* Category badges */}
+                      {product.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {product.categories.map((pc) => (
+                            <span
+                              key={pc.id}
+                              className="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
+                            >
+                              {pc.category.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl font-bold text-[rgb(254,0,0)]">

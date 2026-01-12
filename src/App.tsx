@@ -7,6 +7,7 @@ import CartDrawer from './components/CartDrawer';
 import Home from './pages/Home';
 import Produtos from './pages/Produtos';
 import CarrinhoPublico from './pages/CarrinhoPublico';
+import Checkout from './pages/Checkout';
 import PainelAdmin from './pages/PainelAdmin';
 
 function AppContent() {
@@ -18,6 +19,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/produtos" element={<Produtos />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/carrinho/:uid" element={<CarrinhoPublico />} />
       </Routes>
       <Footer />

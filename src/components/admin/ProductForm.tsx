@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Product, Category } from '../../types';
+import ImageUpload from './ImageUpload';
 
 interface ProductFormProps {
   product?: Product;
@@ -15,7 +16,7 @@ export default function ProductForm({ product, categories, onSubmit, onClose }: 
     description: product?.description || '',
     price: product?.price || 0,
     imageUrl: product?.imageUrl || '',
-    categoryId: product?.categoryId || (categories[0]?.id || 0),
+    categoryIds: product?.categories?.map(pc => pc.categoryId) || [],
     active: product?.active !== undefined ? product.active : true
   });
   const [loading, setLoading] = useState(false);
@@ -84,56 +85,52 @@ export default function ProductForm({ product, categories, onSubmit, onClose }: 
               type="number"
               step="0.01"
               min="0"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+              value={formData.price || ''}
+              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              URL da Imagem
-            </label>
-            <input
-              type="url"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
-              required
-            />
-          </div>
-
-          {formData.imageUrl && (
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-2">Pré-visualização:</p>
-              <img
-                src={formData.imageUrl}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded-lg"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Imagem+Indisponível';
-                }}
-              />
-            </div>
-          )}
+          <ImageUpload
+            currentImageUrl={formData.imageUrl}
+            onImageUrlChange={(url) => setFormData({ ...formData, imageUrl: url })}
+            uploadEndpoint="products"
+            label="Imagem do Produto"
+          />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Categoria
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Categorias (selecione uma ou mais)
             </label>
-            <select
-              value={formData.categoryId}
-              onChange={(e) => setFormData({ ...formData, categoryId: parseInt(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
-              required
-            >
+            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-4">
               {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
+                <label
+                  key={category.id}
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.categoryIds.includes(category.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({
+                          ...formData,
+                          categoryIds: [...formData.categoryIds, category.id]
+                        });
+                      } else {
+                        setFormData({
+                          ...formData,
+                          categoryIds: formData.categoryIds.filter(id => id !== category.id)
+                        });
+                      }
+                    }}
+                    className="w-5 h-5 text-[rgb(254,0,0)] rounded focus:ring-[rgb(254,0,0)] cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-700">{category.name}</span>
+                </label>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
