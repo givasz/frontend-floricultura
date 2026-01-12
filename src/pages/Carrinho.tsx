@@ -10,6 +10,7 @@ export default function Carrinho() {
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup' | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,6 +33,7 @@ export default function Carrinho() {
         customerName: customerName.trim(),
         phone: phone.trim(),
         note: note.trim(),
+        deliveryMethod: deliveryMethod ?? 'pickup', // use sua variável de seleção ou um valor padrão
         items: items.map(item => ({
           productId: item.product.id,
           qty: item.quantity
@@ -53,6 +55,7 @@ export default function Carrinho() {
       setCustomerName('');
       setPhone('');
       setNote('');
+      setDeliveryMethod(null);
 
       showToast('Carrinho criado com sucesso! Redirecionando para WhatsApp...', 'success');
     } catch (error) {
