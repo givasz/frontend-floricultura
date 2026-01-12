@@ -24,9 +24,18 @@ export interface Product {
   active: boolean;
   categoryId: number;
   category?: Category;
+  // Produtos podem ter múltiplas categorias (relação many-to-many)
+  categories?: ProductCategory[];
   images?: ProductImage[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProductCategory {
+  id: number;
+  productId: number;
+  categoryId: number;
+  category: Category;
 }
 
 export interface CartItem {
@@ -55,8 +64,16 @@ export interface Cart {
   deliveryMethod: 'delivery' | 'pickup';
   address?: string;
   items: CartItemResponse[];
+  
+  // Campos extras que o backend pode retornar
   link?: string;
   whatsappLink?: string;
+  paymentMethod?: 'pix' | 'credit_card' | 'debit_card' | 'cash';
+  needsChange?: boolean;
+  changeFor?: number;
+  recipientName?: string;
+  recipientPhone?: string;
+  
   createdAt: string;
   updatedAt: string;
 }
@@ -97,4 +114,10 @@ export interface SiteConfig {
   heroImageUrl: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// Tipo usado pelo contexto local do carrinho (produto + quantidade)
+export interface CartProductItem {
+  product: Product;
+  quantity: number;
 }
