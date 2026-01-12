@@ -69,9 +69,9 @@ export const api = {
     changeFor?: number;
     recipientName: string;
     recipientPhone: string;
-  }): Promise<void> => {
+  }): Promise<Cart> => {
     const res = await fetch(`${API_URL}/carrinho/${uid}/finalize`, {
-      method: "POST",
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(finalizationData)
     });
@@ -80,6 +80,7 @@ export const api = {
       console.error('Erro ao finalizar carrinho:', error);
       throw new Error(error.error || 'Erro ao finalizar carrinho');
     }
+    return res.json();
   },
 
   // Configurações do site
@@ -175,7 +176,8 @@ export const api = {
       if (filters.page) params.append('page', filters.page.toString());
       if (filters.limit) params.append('limit', filters.limit.toString());
 
-      const res = await fetch(`${API_URL}/admin/carrinhos?${params}`, {
+      const adminRoute = import.meta.env.VITE_ADMIN_ROUTE || '/admin';
+      const res = await fetch(`${API_URL}${adminRoute}/carrinhos?${params}`, {
         headers: api.admin.getHeaders()
       });
       if (!res.ok) throw new Error('Erro ao buscar carrinhos');

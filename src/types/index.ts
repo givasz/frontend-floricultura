@@ -55,6 +55,8 @@ export interface Cart {
   deliveryMethod: 'delivery' | 'pickup';
   address?: string;
   items: CartItemResponse[];
+  link?: string;
+  whatsappLink?: string;
   createdAt: string;
   updatedAt: string;
 }
