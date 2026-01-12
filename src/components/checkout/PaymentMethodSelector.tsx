@@ -51,7 +51,6 @@ export function PaymentMethodSelector({
             />
             <div>
               <div className="font-medium">PIX</div>
-              <div className="text-sm text-gray-500">Pagamento instantâneo</div>
             </div>
           </label>
 
@@ -66,7 +65,6 @@ export function PaymentMethodSelector({
             />
             <div>
               <div className="font-medium">Cartão de Crédito</div>
-              <div className="text-sm text-gray-500">Pagamento na entrega</div>
             </div>
           </label>
 
@@ -81,7 +79,6 @@ export function PaymentMethodSelector({
             />
             <div>
               <div className="font-medium">Cartão de Débito</div>
-              <div className="text-sm text-gray-500">Pagamento na entrega</div>
             </div>
           </label>
 
@@ -96,7 +93,6 @@ export function PaymentMethodSelector({
             />
             <div>
               <div className="font-medium">Dinheiro</div>
-              <div className="text-sm text-gray-500">Pagamento na entrega</div>
             </div>
           </label>
         </div>
