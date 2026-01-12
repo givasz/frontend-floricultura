@@ -87,7 +87,12 @@ export const api = {
   getSiteConfig: async (): Promise<SiteConfig> => {
     const res = await fetch(`${API_URL}/config`);
     if (!res.ok) throw new Error('Erro ao buscar configurações');
-    return res.json();
+    const config = await res.json();
+    // Normalizar heroImageUrl: se for um caminho relativo (começa com '/'), prefixar com API_URL
+    if (config && config.heroImageUrl && typeof config.heroImageUrl === 'string' && config.heroImageUrl.startsWith('/')) {
+      config.heroImageUrl = `${API_URL}${config.heroImageUrl}`;
+    }
+    return config;
   },
 
   admin: {
@@ -225,6 +230,30 @@ export const api = {
         throw new Error(error.error || 'Erro ao enviar imagem');
       }
       return res.json();
+    },
+
+    uploadSiteHeroImage: async (file: File): Promise<{ imageUrl: string; config: SiteConfig }> => {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await fetch(`${API_URL}/config/upload-image`, {
+        method: "POST",
+        headers: api.admin.getAuthHeaders(),
+        body: formData
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Erro ao enviar imagem' }));
+        throw new Error(error.error || 'Erro ao enviar imagem');
+      }
+
+      const result = await res.json();
+      // Normalizar imageUrl e config.heroImageUrl se vierem relativos
+      const imageUrl = result.imageUrl && typeof result.imageUrl === 'string' && result.imageUrl.startsWith('/') ? `${API_URL}${result.imageUrl}` : result.imageUrl;
+      if (result.config && result.config.heroImageUrl && typeof result.config.heroImageUrl === 'string' && result.config.heroImageUrl.startsWith('/')) {
+        result.config.heroImageUrl = `${API_URL}${result.config.heroImageUrl}`;
+      }
+
+      return { imageUrl, config: result.config };
     },
 
     createProductWithImage: async (formData: FormData): Promise<Product> => {
