@@ -1,13 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { Product } from '../types';
-
-interface CartItem {
-  product: Product;
-  quantity: number;
-}
+import { Product, CartProductItem } from '../types';
 
 interface CartContextType {
-  items: CartItem[];
+  items: CartProductItem[];
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -22,7 +17,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartProductItem[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const openDrawer = () => setIsDrawerOpen(true);
