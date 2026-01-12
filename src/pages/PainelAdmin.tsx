@@ -89,23 +89,17 @@ export default function PainelAdmin() {
   }, [isAuthenticated, activeTab, productsPage, categoriesPage, cartsPage]);
 
   const handleLogin = async (username: string, password: string) => {
-    // Validar credenciais localmente primeiro
-    if (username !== 'admin' || password !== 'admin123') {
-      throw new Error('Credenciais inválidas');
-    }
-
-    // Usar o token Bearer fornecido pelo backend
-    const token = '1986';
-    localStorage.setItem('adminToken', token);
-
     try {
-      // Testar autenticação fazendo uma requisição
+      const token = await api.admin.login(username, password);
+      localStorage.setItem('adminToken', token);
+      // Testar autenticação fazendo uma requisição para garantir que token está válido
       await api.getCategories();
       setIsAuthenticated(true);
       showToast('Login realizado com sucesso!', 'success');
-    } catch (error) {
+    } catch (error: any) {
       localStorage.removeItem('adminToken');
-      throw new Error('Erro ao conectar com o servidor');
+      showToast(error.message || 'Usuário ou senha incorretos', 'error');
+      throw error;
     }
   };
 

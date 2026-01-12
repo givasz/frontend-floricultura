@@ -111,6 +111,22 @@ export const api = {
       };
     },
 
+    // Autenticação admin (login)
+    login: async (username: string, password: string) => {
+      const adminRoute = import.meta.env.VITE_ADMIN_ROUTE || '/admin';
+      const res = await fetch(`${API_URL}${adminRoute}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Erro ao autenticar' }));
+        throw new Error(error.error || 'Erro ao autenticar');
+      }
+      const data = await res.json();
+      return data.token;
+    },
+
     createProduct: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'category'>): Promise<Product> => {
       const res = await fetch(`${API_URL}/products`, {
         method: "POST",
