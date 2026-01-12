@@ -33,7 +33,7 @@ export default function Carrinho() {
         customerName: customerName.trim(),
         phone: phone.trim(),
         note: note.trim(),
-        deliveryMethod: deliveryMethod ?? 'pickup', // use sua variável de seleção ou um valor padrão
+        deliveryMethod: deliveryMethod ?? 'pickup',
         items: items.map(item => ({
           productId: item.product.id,
           qty: item.quantity
@@ -226,6 +226,37 @@ export default function Carrinho() {
                     rows={3}
                     placeholder="Ex: Entregar até 18h, incluir cartão de felicitações..."
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Forma de entrega
+                  </label>
+                  <div className="flex gap-3">
+                    <label className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${deliveryMethod === 'pickup' ? 'border-[rgb(254,0,0)] bg-[rgba(254,0,0,0.05)]' : 'border-gray-200'} cursor-pointer`}>
+                      <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="pickup"
+                        checked={deliveryMethod === 'pickup'}
+                        onChange={() => setDeliveryMethod('pickup')}
+                        className="sr-only"
+                      />
+                      Retirada
+                    </label>
+
+                    <label className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${deliveryMethod === 'delivery' ? 'border-[rgb(254,0,0)] bg-[rgba(254,0,0,0.05)]' : 'border-gray-200'} cursor-pointer`}>
+                      <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="delivery"
+                        checked={deliveryMethod === 'delivery'}
+                        onChange={() => setDeliveryMethod('delivery')}
+                        className="sr-only"
+                      />
+                      Entrega
+                    </label>
+                  </div>
                 </div>
 
                 {/* Resumo do Total */}
