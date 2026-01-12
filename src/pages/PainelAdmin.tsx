@@ -66,6 +66,7 @@ export default function PainelAdmin() {
   const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
   const [loadingConfig, setLoadingConfig] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [uploadingHero, setUploadingHero] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -260,6 +261,30 @@ export default function PainelAdmin() {
       showToast('Erro ao carregar configurações', 'error');
     } finally {
       setLoadingConfig(false);
+    }
+  };
+
+  const handleHeroFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await handleUploadHero(file);
+    // limpa o input
+    e.currentTarget.value = '';
+  };
+
+  const handleUploadHero = async (file: File) => {
+    setUploadingHero(true);
+    try {
+      const res = await api.admin.uploadSiteHeroImage(file);
+      setHeroImageUrl(res.imageUrl);
+      setSiteConfig(res.config);
+      showToast('Imagem enviada com sucesso!', 'success');
+      // recarregar configurações do servidor para garantir estado consistente
+      loadConfig();
+    } catch (error) {
+      showToast('Erro ao enviar imagem', 'error');
+    } finally {
+      setUploadingHero(false);
     }
   };
 
@@ -641,6 +666,28 @@ export default function PainelAdmin() {
                             e.currentTarget.alt = 'Erro ao carregar imagem';
                           }}
                         />
+                      </div>
+
+                      <div className="mt-3 flex items-center gap-3">
+                        <input
+                          id="heroUploadInput"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleHeroFileChange}
+                          className="hidden"
+                        />
+                        <label htmlFor="heroUploadInput" className="px-4 py-2 bg-gray-100 rounded-md cursor-pointer">
+                          Selecionar arquivo
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById('heroUploadInput')?.click()}
+                          disabled={uploadingHero}
+                          className="px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors"
+                        >
+                          {uploadingHero ? 'Enviando...' : 'Enviar Imagem'}
+                        </button>
+                        <p className="text-sm text-gray-500">ou cole a URL acima e clique em Salvar Configurações</p>
                       </div>
                     </div>
                   )}
