@@ -181,7 +181,7 @@ export default function Produtos() {
                       </p>
 
                       {/* Category badges */}
-                      {product.categories.length > 0 && (
+                      {product.categories && product.categories.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mb-3">
                           {product.categories.map((pc) => (
                             <span
