@@ -669,7 +669,7 @@ export default function PainelAdmin() {
                         <img
                           src={heroImageUrl}
                           alt="Preview"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             e.currentTarget.src = '';
                             e.currentTarget.alt = 'Erro ao carregar imagem';
