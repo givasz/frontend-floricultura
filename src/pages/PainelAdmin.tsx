@@ -417,7 +417,22 @@ export default function PainelAdmin() {
                       <tr key={product.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <img src={product.imageUrl} alt={product.name} className="w-12 h-12 object-cover rounded" />
+                          <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
+                            {product.imageUrl ? (
+                              <img
+                                src={`${import.meta.env.VITE_API_URL}${product.imageUrl}`} 
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Fallback caso a imagem não carregue
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = "https://placehold.co/100?text=Sem+Foto";
+                                }}
+                              />
+                            ) : (
+                              <Images className="w-6 h-6 text-gray-400" />
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
