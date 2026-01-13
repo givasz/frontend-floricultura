@@ -112,12 +112,12 @@ export const api = {
     },
 
     // Autenticação admin (login)
-    login: async (username: string, password: string) => {
+    login: async (email: string, password: string) => {
       const adminRoute = import.meta.env.VITE_ADMIN_ROUTE || '/admin';
       const res = await fetch(`${API_URL}${adminRoute}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
       });
       if (!res.ok) {
         const error = await res.json().catch(() => ({ error: 'Erro ao autenticar' }));
