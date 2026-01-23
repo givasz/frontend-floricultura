@@ -88,23 +88,26 @@ export default function PainelAdmin() {
     }
   }, [isAuthenticated, activeTab, productsPage, categoriesPage, cartsPage]);
 
-  const handleLogin = async (username: string, password: string) => {
+  const handleLogin = async (email: string, password: string) => {
     try {
-      const token = await api.admin.login(username, password);
+      const { token, adminRoute } = await api.admin.login(email, password);
       localStorage.setItem('adminToken', token);
+      localStorage.setItem('adminRoute', adminRoute);
       // Testar autenticação fazendo uma requisição para garantir que token está válido
       await api.getCategories();
       setIsAuthenticated(true);
       showToast('Login realizado com sucesso!', 'success');
     } catch (error: any) {
       localStorage.removeItem('adminToken');
-      showToast(error.message || 'Usuário ou senha incorretos', 'error');
+      localStorage.removeItem('adminRoute');
+      showToast(error.message || 'Email ou senha incorretos', 'error');
       throw error;
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminRoute');
     setIsAuthenticated(false);
     showToast('Logout realizado com sucesso', 'info');
   };

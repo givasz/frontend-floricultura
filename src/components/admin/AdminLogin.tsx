@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Lock, ArrowLeft } from 'lucide-react';
 
 interface AdminLoginProps {
-  onLogin: (username: string, password: string) => Promise<void>;
+  onLogin: (email: string, password: string) => Promise<void>;
 }
 
 export default function AdminLogin({ onLogin }: AdminLoginProps) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,9 +17,9 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
     setLoading(true);
 
     try {
-      await onLogin(username, password);
+      await onLogin(email, password);
     } catch (err) {
-      setError('Usuário ou senha incorretos');
+      setError('Email ou senha incorretos');
     } finally {
       setLoading(false);
     }
@@ -54,14 +54,14 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Usuário
+              Email
             </label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
-              placeholder="Digite seu usuário"
+              placeholder="Digite seu email"
               required
             />
           </div>

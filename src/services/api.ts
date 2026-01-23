@@ -112,9 +112,8 @@ export const api = {
     },
 
     // Autenticação admin (login)
-    login: async (email: string, password: string) => {
-      const adminRoute = import.meta.env.VITE_ADMIN_ROUTE || '/admin';
-      const res = await fetch(`${API_URL}${adminRoute}/login`, {
+    login: async (email: string, password: string): Promise<{ token: string; adminRoute: string }> => {
+      const res = await fetch(`${API_URL}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -124,7 +123,7 @@ export const api = {
         throw new Error(error.error || 'Erro ao autenticar');
       }
       const data = await res.json();
-      return data.token;
+      return { token: data.token, adminRoute: data.adminRoute };
     },
 
     createProduct: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'category'>): Promise<Product> => {
@@ -197,7 +196,8 @@ export const api = {
       if (filters.page) params.append('page', filters.page.toString());
       if (filters.limit) params.append('limit', filters.limit.toString());
 
-      const adminRoute = import.meta.env.VITE_ADMIN_ROUTE || '/admin';
+      // Usa a adminRoute armazenada no login
+      const adminRoute = localStorage.getItem('adminRoute') || '/api/admin';
       const res = await fetch(`${API_URL}${adminRoute}/carrinhos?${params}`, {
         headers: api.admin.getHeaders()
       });
