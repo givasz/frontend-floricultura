@@ -43,14 +43,21 @@ export default function ImageGalleryManager({ productId, onUpdate }: ImageGaller
       return;
     }
 
+    // Verifica se as credenciais existem antes de enviar
+    const credentials = localStorage.getItem('adminCredentials');
+    if (!credentials) {
+      console.warn('[ImageGalleryManager] adminCredentials não encontrado no localStorage - faça login novamente');
+      alert('Sessão expirada. Faça login novamente.');
+      return;
+    }
+
     try {
-      const token = localStorage.getItem('adminToken');
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
       const response = await fetch(`${API_URL}/products/${productId}/images/${imageId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Basic ${credentials}`
         }
       });
 
@@ -85,6 +92,14 @@ export default function ImageGalleryManager({ productId, onUpdate }: ImageGaller
   };
 
   const saveOrder = async () => {
+    // Verifica se as credenciais existem antes de enviar
+    const credentials = localStorage.getItem('adminCredentials');
+    if (!credentials) {
+      console.warn('[ImageGalleryManager] adminCredentials não encontrado no localStorage - faça login novamente');
+      alert('Sessão expirada. Faça login novamente.');
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -94,14 +109,13 @@ export default function ImageGalleryManager({ productId, onUpdate }: ImageGaller
         order: index
       }));
 
-      const token = localStorage.getItem('adminToken');
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
       const response = await fetch(`${API_URL}/products/${productId}/images/reorder`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Basic ${credentials}`
         },
         body: JSON.stringify({ images: reorderedImages })
       });

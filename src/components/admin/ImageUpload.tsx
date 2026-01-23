@@ -80,16 +80,27 @@ export default function ImageUpload({
     setError('');
 
     try {
+      // Verifica se as credenciais existem antes de enviar
+      const credentials = localStorage.getItem('adminCredentials');
+      if (!credentials) {
+        console.warn('[ImageUpload] adminCredentials não encontrado no localStorage - faça login novamente');
+        setError('Sessão expirada. Faça login novamente.');
+        setImageFile(null);
+        setPreview(null);
+        setUploading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('image', file);
 
-      const token = localStorage.getItem('adminToken');
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+      // Usa Basic Auth (não definir Content-Type, o FormData cuida disso)
       const response = await fetch(`${API_URL}/${uploadEndpoint}/upload-image`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Basic ${credentials}`
         },
         body: formData
       });

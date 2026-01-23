@@ -67,6 +67,14 @@ export default function MultipleImageUpload({ productId, onSuccess }: MultipleIm
       return;
     }
 
+    // Verifica se as credenciais existem antes de enviar
+    const credentials = localStorage.getItem('adminCredentials');
+    if (!credentials) {
+      console.warn('[MultipleImageUpload] adminCredentials não encontrado no localStorage - faça login novamente');
+      setError('Sessão expirada. Faça login novamente.');
+      return;
+    }
+
     setUploading(true);
     setError('');
 
@@ -78,13 +86,13 @@ export default function MultipleImageUpload({ productId, onSuccess }: MultipleIm
         formData.append('images', file);
       });
 
-      const token = localStorage.getItem('adminToken');
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+      // Usa Basic Auth (não definir Content-Type, o FormData cuida disso)
       const response = await fetch(`${API_URL}/products/${productId}/images/multiple`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Basic ${credentials}`
         },
         body: formData
       });
