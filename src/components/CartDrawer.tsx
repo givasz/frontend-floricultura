@@ -1,6 +1,7 @@
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../utils/imageUrl';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -85,7 +86,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {/* Imagem */}
                       <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white">
                         <img
-                          src={item.product.imageUrl}
+                          src={getImageUrl(item.product.imageUrl)}
                           alt={item.product.name}
                           className="w-full h-full object-cover"
                         />

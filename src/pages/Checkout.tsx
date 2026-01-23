@@ -6,6 +6,7 @@ import { api } from '../services/api';
 import { useToast } from '../hooks/useToast';
 import { PaymentMethodSelector } from '../components/checkout/PaymentMethodSelector';
 import { RecipientInfoForm } from '../components/checkout/RecipientInfoForm';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -434,7 +435,7 @@ export default function Checkout() {
                 {items.map((item) => (
                   <div key={item.product.id} className="flex gap-3">
                     <img
-                      src={item.product.imageUrl}
+                      src={getImageUrl(item.product.imageUrl)}
                       alt={item.product.name}
                       className="w-16 h-16 rounded-lg object-cover"
                     />
