@@ -116,6 +116,9 @@ export const api = {
 
     getAuthHeaders: () => {
       const credentials = localStorage.getItem("adminCredentials");
+      if (!credentials) {
+        console.warn("[API] adminCredentials não encontrado no localStorage - faça login novamente");
+      }
       return {
         "Authorization": `Basic ${credentials}`
       };
