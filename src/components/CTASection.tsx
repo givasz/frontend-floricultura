@@ -1,4 +1,5 @@
 import { ShoppingBag, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function CTASection() {
   return (
@@ -13,15 +14,13 @@ export default function CTASection() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-          <a
-            href="https://giovannaflores.net/"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/produtos"
             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-[var(--vermelho)] px-10 lg:px-12 py-5 lg:py-6 rounded-xl font-bold text-lg hover:scale-105 transition-transform"
           >
             <ShoppingBag className="w-5 h-5" />
             Ver Catálogo Completo
-          </a>
+          </Link>
 
           <a
             href="https://wa.me/5598983078865"
