@@ -69,8 +69,8 @@ export default function PainelAdmin() {
   const [uploadingHero, setUploadingHero] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
+    const credentials = localStorage.getItem('adminCredentials');
+    if (credentials) {
       setIsAuthenticated(true);
     }
   }, []);
@@ -90,15 +90,17 @@ export default function PainelAdmin() {
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const { token, adminRoute } = await api.admin.login(email, password);
-      localStorage.setItem('adminToken', token);
+      const { adminRoute } = await api.admin.login(email, password);
+      // Gerar base64 das credenciais para Basic Auth (não expõe senha diretamente)
+      const credentials = btoa(`${email}:${password}`);
+      localStorage.setItem('adminCredentials', credentials);
       localStorage.setItem('adminRoute', adminRoute);
-      // Testar autenticação fazendo uma requisição para garantir que token está válido
+      // Testar autenticação fazendo uma requisição para garantir que credenciais estão válidas
       await api.getCategories();
       setIsAuthenticated(true);
       showToast('Login realizado com sucesso!', 'success');
     } catch (error: any) {
-      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminCredentials');
       localStorage.removeItem('adminRoute');
       showToast(error.message || 'Email ou senha incorretos', 'error');
       throw error;
@@ -106,7 +108,7 @@ export default function PainelAdmin() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminCredentials');
     localStorage.removeItem('adminRoute');
     setIsAuthenticated(false);
     showToast('Logout realizado com sucesso', 'info');

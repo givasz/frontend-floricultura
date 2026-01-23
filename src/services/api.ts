@@ -96,18 +96,28 @@ export const api = {
   },
 
   admin: {
+    // Retorna as credenciais base64 armazenadas após login
+    getBasicAuth: () => {
+      return localStorage.getItem("adminCredentials") || "";
+    },
+
+    // Retorna a rota admin dinâmica
+    getAdminRoute: () => {
+      return localStorage.getItem("adminRoute") || "/api/admin";
+    },
+
     getHeaders: () => {
-      const token = localStorage.getItem("adminToken");
+      const credentials = localStorage.getItem("adminCredentials");
       return {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Basic ${credentials}`
       };
     },
 
     getAuthHeaders: () => {
-      const token = localStorage.getItem("adminToken");
+      const credentials = localStorage.getItem("adminCredentials");
       return {
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Basic ${credentials}`
       };
     },
 
@@ -127,7 +137,8 @@ export const api = {
     },
 
     createProduct: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'category'>): Promise<Product> => {
-      const res = await fetch(`${API_URL}/products`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products`, {
         method: "POST",
         headers: api.admin.getHeaders(),
         body: JSON.stringify(product)
@@ -137,7 +148,8 @@ export const api = {
     },
 
     updateProduct: async (id: number, product: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'category'>>): Promise<Product> => {
-      const res = await fetch(`${API_URL}/products/${id}`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/${id}`, {
         method: "PUT",
         headers: api.admin.getHeaders(),
         body: JSON.stringify(product)
@@ -147,7 +159,8 @@ export const api = {
     },
 
     toggleProduct: async (id: number): Promise<Product> => {
-      const res = await fetch(`${API_URL}/products/${id}/toggle`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/${id}/toggle`, {
         method: "POST",
         headers: api.admin.getHeaders()
       });
@@ -156,7 +169,8 @@ export const api = {
     },
 
     deleteProduct: async (id: number): Promise<void> => {
-      const res = await fetch(`${API_URL}/products/${id}`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/${id}`, {
         method: "DELETE",
         headers: api.admin.getHeaders()
       });
@@ -164,7 +178,8 @@ export const api = {
     },
 
     createCategory: async (category: { name: string; imageUrl?: string }): Promise<Category> => {
-      const res = await fetch(`${API_URL}/categories`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/categories`, {
         method: "POST",
         headers: api.admin.getHeaders(),
         body: JSON.stringify(category)
@@ -174,7 +189,8 @@ export const api = {
     },
 
     updateCategory: async (id: number, category: { name: string; imageUrl?: string }): Promise<Category> => {
-      const res = await fetch(`${API_URL}/categories/${id}`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/categories/${id}`, {
         method: "PUT",
         headers: api.admin.getHeaders(),
         body: JSON.stringify(category)
@@ -184,7 +200,8 @@ export const api = {
     },
 
     deleteCategory: async (id: number): Promise<void> => {
-      const res = await fetch(`${API_URL}/categories/${id}`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/categories/${id}`, {
         method: "DELETE",
         headers: api.admin.getHeaders()
       });
@@ -206,7 +223,8 @@ export const api = {
     },
 
     updateSiteConfig: async (config: { heroImageUrl: string }): Promise<SiteConfig> => {
-      const res = await fetch(`${API_URL}/config`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/config`, {
         method: "PUT",
         headers: api.admin.getHeaders(),
         body: JSON.stringify(config)
@@ -217,10 +235,11 @@ export const api = {
 
     // Upload de imagens
     uploadProductImage: async (file: File): Promise<{ imageUrl: string }> => {
+      const adminRoute = api.admin.getAdminRoute();
       const formData = new FormData();
       formData.append('image', file);
 
-      const res = await fetch(`${API_URL}/products/upload-image`, {
+      const res = await fetch(`${API_URL}${adminRoute}/products/upload-image`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -233,10 +252,11 @@ export const api = {
     },
 
     uploadCategoryImage: async (file: File): Promise<{ imageUrl: string }> => {
+      const adminRoute = api.admin.getAdminRoute();
       const formData = new FormData();
       formData.append('image', file);
 
-      const res = await fetch(`${API_URL}/categories/upload-image`, {
+      const res = await fetch(`${API_URL}${adminRoute}/categories/upload-image`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -249,10 +269,11 @@ export const api = {
     },
 
     uploadSiteHeroImage: async (file: File): Promise<{ imageUrl: string; config: SiteConfig }> => {
+      const adminRoute = api.admin.getAdminRoute();
       const formData = new FormData();
       formData.append('image', file);
 
-      const res = await fetch(`${API_URL}/config/upload-image`, {
+      const res = await fetch(`${API_URL}${adminRoute}/config/upload-image`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -273,7 +294,8 @@ export const api = {
     },
 
     createProductWithImage: async (formData: FormData): Promise<Product> => {
-      const res = await fetch(`${API_URL}/products/with-image`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/with-image`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -286,7 +308,8 @@ export const api = {
     },
 
     updateProductWithImage: async (id: number, formData: FormData): Promise<Product> => {
-      const res = await fetch(`${API_URL}/products/${id}/with-image`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/${id}/with-image`, {
         method: "PUT",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -299,7 +322,8 @@ export const api = {
     },
 
     createCategoryWithImage: async (formData: FormData): Promise<Category> => {
-      const res = await fetch(`${API_URL}/categories/with-image`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/categories/with-image`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -312,7 +336,8 @@ export const api = {
     },
 
     updateCategoryWithImage: async (id: number, formData: FormData): Promise<Category> => {
-      const res = await fetch(`${API_URL}/categories/${id}/with-image`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/categories/${id}/with-image`, {
         method: "PUT",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -332,13 +357,14 @@ export const api = {
     },
 
     addProductImage: async (productId: number, file: File, order?: number) => {
+      const adminRoute = api.admin.getAdminRoute();
       const formData = new FormData();
       formData.append('image', file);
       if (order !== undefined) {
         formData.append('order', order.toString());
       }
 
-      const res = await fetch(`${API_URL}/products/${productId}/images`, {
+      const res = await fetch(`${API_URL}${adminRoute}/products/${productId}/images`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -351,12 +377,13 @@ export const api = {
     },
 
     addMultipleProductImages: async (productId: number, files: File[]) => {
+      const adminRoute = api.admin.getAdminRoute();
       const formData = new FormData();
       files.forEach(file => {
         formData.append('images', file);
       });
 
-      const res = await fetch(`${API_URL}/products/${productId}/images/multiple`, {
+      const res = await fetch(`${API_URL}${adminRoute}/products/${productId}/images/multiple`, {
         method: "POST",
         headers: api.admin.getAuthHeaders(),
         body: formData
@@ -369,7 +396,8 @@ export const api = {
     },
 
     deleteProductImage: async (productId: number, imageId: number) => {
-      const res = await fetch(`${API_URL}/products/${productId}/images/${imageId}`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/${productId}/images/${imageId}`, {
         method: "DELETE",
         headers: api.admin.getAuthHeaders()
       });
@@ -377,7 +405,8 @@ export const api = {
     },
 
     reorderProductImages: async (productId: number, images: { id: number; order: number }[]) => {
-      const res = await fetch(`${API_URL}/products/${productId}/images/reorder`, {
+      const adminRoute = api.admin.getAdminRoute();
+      const res = await fetch(`${API_URL}${adminRoute}/products/${productId}/images/reorder`, {
         method: "PUT",
         headers: api.admin.getHeaders(),
         body: JSON.stringify({ images })
