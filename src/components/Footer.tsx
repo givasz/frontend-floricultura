@@ -36,25 +36,18 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-4">Contato</h3>
             <div className="space-y-3">
               <a
-                href="https://wa.me/5538997297224"
+                href="https://wa.me/5598983078865"
                 className="flex items-start gap-3 text-gray-400 hover:text-white transition-colors"
               >
                 <Phone className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>(38) 99729-7224</span>
+                <span>(98) 98307-8865</span>
               </a>
               <a
-                href="https://wa.me/5538997297224"
+                href="https://wa.me/5598985908178"
                 className="flex items-start gap-3 text-gray-400 hover:text-white transition-colors"
               >
                 <Phone className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>(98) 98690-8178</span>
-              </a>
-              <a
-                href="mailto:Giovannasalgueiroaguiar@gmail.com"
-                className="flex items-start gap-3 text-gray-400 hover:text-white transition-colors"
-              >
-                <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span className="break-all">Giovannasalgueiroaguiar@gmail.com</span>
+                <span>(98) 98590-8178</span>
               </a>
               <a
                 href="mailto:Flordemaiofloriculturas@hotmail.com"
@@ -62,6 +55,13 @@ export default function Footer() {
               >
                 <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <span className="break-all">Flordemaiofloriculturas@hotmail.com</span>
+              </a>
+              <a
+                href="mailto:Giovannasalgueiroaguiar@gmail.com"
+                className="flex items-start gap-3 text-gray-400 hover:text-white transition-colors"
+              >
+                <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span className="break-all">Giovannasalgueiroaguiar@gmail.com</span>
               </a>
             </div>
           </div>
