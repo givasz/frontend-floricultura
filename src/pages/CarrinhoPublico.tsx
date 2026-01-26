@@ -4,6 +4,7 @@ import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store, CreditCard, 
 import { api } from '../services/api';
 import { Cart } from '../types';
 import Loading from '../components/Loading';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function CarrinhoPublico() {
   const { uid } = useParams<{ uid: string }>();
@@ -205,7 +206,7 @@ export default function CarrinhoPublico() {
                 {/* Imagem */}
                 <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                   <img
-                    src={item.product.imageUrl}
+                    src={getImageUrl(item.product.imageUrl)}
                     alt={item.product.name}
                     className="w-full h-full object-cover"
                   />
