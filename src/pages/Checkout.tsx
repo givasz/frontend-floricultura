@@ -287,19 +287,6 @@ export default function Checkout() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Observações
-                    </label>
-                    <textarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all resize-none"
-                      rows={3}
-                      placeholder="Ex: Entregar até 18h, incluir cartão..."
-                    />
-                  </div>
-
                   <button
                     onClick={handleNextStep}
                     className="w-full bg-[rgb(254,0,0)] text-white px-6 py-4 rounded-xl font-bold text-lg hover:bg-[rgb(220,0,0)] transition-all flex items-center justify-center gap-2"
@@ -408,6 +395,19 @@ export default function Checkout() {
                       }}
                       nameError={recipientNameError}
                       phoneError={recipientPhoneError}
+                    />
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Observações (opcional)
+                    </label>
+                    <textarea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all resize-none"
+                      rows={3}
+                      placeholder="Ex: Entregar até 18h, incluir cartão..."
                     />
                   </div>
 

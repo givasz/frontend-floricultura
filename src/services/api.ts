@@ -63,6 +63,18 @@ export const api = {
     return res.json();
   },
 
+  getCartAuth: async (uid: string): Promise<Cart> => {
+    const credentials = localStorage.getItem("adminCredentials");
+    const res = await fetch(`${API_URL}/carrinho/${uid}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${credentials}`
+      }
+    });
+    if (!res.ok) throw new Error('Erro ao buscar carrinho');
+    return res.json();
+  },
+
   finalizeCart: async (uid: string, finalizationData: {
     paymentMethod: 'pix' | 'credit_card' | 'debit_card' | 'cash';
     needsChange?: boolean;

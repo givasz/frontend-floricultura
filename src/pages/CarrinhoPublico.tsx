@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store, CreditCard, Banknote, Users } from 'lucide-react';
+import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store, CreditCard, Banknote, Users, LogOut } from 'lucide-react';
 import { api } from '../services/api';
 import { Cart } from '../types';
 import Loading from '../components/Loading';
+import AdminLogin from '../components/admin/AdminLogin';
 import { getImageUrl } from '../utils/imageUrl';
 
 export default function CarrinhoPublico() {
@@ -11,8 +12,22 @@ export default function CarrinhoPublico() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
+  // Verificar se já está autenticado como admin
   useEffect(() => {
+    const credentials = localStorage.getItem('adminCredentials');
+    if (credentials) {
+      setIsAuthenticated(true);
+    }
+    setCheckingAuth(false);
+  }, []);
+
+  // Buscar carrinho somente após autenticação
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchCart = async () => {
       if (!uid) {
         setError('UID do carrinho não fornecido');
@@ -21,7 +36,7 @@ export default function CarrinhoPublico() {
       }
 
       try {
-        const data = await api.getCart(uid);
+        const data = await api.getCartAuth(uid);
         setCart(data);
       } catch (err) {
         console.error('Erro ao buscar carrinho:', err);
@@ -32,7 +47,38 @@ export default function CarrinhoPublico() {
     };
 
     fetchCart();
-  }, [uid]);
+  }, [uid, isAuthenticated]);
+
+  const handleLogin = async (email: string, password: string) => {
+    const { adminRoute } = await api.admin.login(email, password);
+    const credentials = btoa(`${email}:${password}`);
+    localStorage.setItem('adminCredentials', credentials);
+    localStorage.setItem('adminRoute', adminRoute);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminCredentials');
+    localStorage.removeItem('adminRoute');
+    setIsAuthenticated(false);
+    setCart(null);
+    setLoading(true);
+    setError(null);
+  };
+
+  // Verificando autenticação
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <Loading />
+      </div>
+    );
+  }
+
+  // Não autenticado - exibir tela de login
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
 
   if (loading) {
     return (
@@ -73,6 +119,17 @@ export default function CarrinhoPublico() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Botão de Logout */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors text-sm font-medium"
+          >
+            <LogOut className="w-4 h-4" />
+            Sair
+          </button>
+        </div>
+
         {/* Header */}
         <div className="bg-white rounded-xl shadow-md p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
