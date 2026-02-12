@@ -16,6 +16,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     if (items.length === 0) return;
     onClose();
     navigate('/checkout');
+    window.scrollTo(0, 0);
   };
 
   return (
