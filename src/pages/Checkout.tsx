@@ -144,21 +144,12 @@ export default function Checkout() {
     setLoading(true);
 
     try {
-      // Montar campo note combinando observações de entrega e mensagem ao destinatário
-      const noteParts: string[] = [];
-      if (deliveryNote.trim()) {
-        noteParts.push(`Obs. de entrega: ${deliveryNote.trim()}`);
-      }
-      if (recipientMessage.trim()) {
-        noteParts.push(`Mensagem ao destinatário: ${recipientMessage.trim()}`);
-      }
-      const combinedNote = noteParts.join('\n\n');
-
       // Criar carrinho
       const cartData = {
         customerName: customerName.trim(),
         phone: phone.trim(),
-        note: combinedNote,
+        note: recipientMessage.trim() || undefined,
+        deliveryNote: deliveryNote.trim() || undefined,
         deliveryMethod,
         address: deliveryMethod === 'delivery' ? address.trim() : undefined,
         items: items.map(item => ({

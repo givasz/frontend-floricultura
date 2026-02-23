@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ShoppingBag, User, Phone, FileText, Calendar, Home, Store, CreditCard, Banknote, Users, LogOut } from 'lucide-react';
+import { ShoppingBag, User, Phone, FileText, MessageSquare, Calendar, Home, Store, CreditCard, Banknote, Users, LogOut } from 'lucide-react';
 import { api } from '../services/api';
 import { Cart } from '../types';
 import Loading from '../components/Loading';
@@ -181,12 +181,22 @@ export default function CarrinhoPublico() {
               </div>
             )}
 
-            {cart.note && (
+            {cart.deliveryNote && (
               <div className="flex items-start gap-3 md:col-span-2">
                 <FileText className="w-5 h-5 text-gray-600 mt-0.5" />
                 <div>
-                  <p className="text-sm text-gray-600">Observações</p>
-                  <p className="font-semibold text-gray-900">{cart.note}</p>
+                  <p className="text-sm text-gray-600">Observações de Entrega</p>
+                  <p className="font-semibold text-gray-900 whitespace-pre-wrap">{cart.deliveryNote}</p>
+                </div>
+              </div>
+            )}
+
+            {cart.note && (
+              <div className="flex items-start gap-3 md:col-span-2">
+                <MessageSquare className="w-5 h-5 text-gray-600 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-600">Mensagem ao Destinatário</p>
+                  <p className="font-semibold text-gray-900 whitespace-pre-wrap">{cart.note}</p>
                 </div>
               </div>
             )}

@@ -60,7 +60,8 @@ export interface Cart {
   uid: string;
   customerName: string;
   phone: string;
-  note?: string;
+  note?: string;          // mensagem ao destinatário
+  deliveryNote?: string;  // observações de entrega
   deliveryMethod: 'delivery' | 'pickup';
   address?: string;
   items: CartItemResponse[];
@@ -81,7 +82,8 @@ export interface Cart {
 export interface CreateCartPayload {
   customerName: string;
   phone: string;
-  note?: string;
+  note?: string;          // mensagem ao destinatário
+  deliveryNote?: string;  // observações de entrega
   deliveryMethod: 'delivery' | 'pickup';
   address?: string;
   items: CartItem[];
