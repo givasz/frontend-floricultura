@@ -48,17 +48,12 @@ export const api = {
 
   // Carrinho
   createCart: async (cartData: CreateCartPayload): Promise<CreateCartResponse> => {
-    console.log('[createCart] payload:', JSON.stringify(cartData));
     const res = await fetch(`${API_URL}/carrinho`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(cartData)
     });
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({ error: 'Resposta inválida do servidor' }));
-      console.error('[createCart] erro do servidor:', errBody);
-      throw new Error(errBody.error || 'Erro ao criar carrinho');
-    }
+    if (!res.ok) throw new Error('Erro ao criar carrinho');
     return res.json();
   },
 

@@ -140,50 +140,56 @@ export default function CarrinhoPublico() {
           </div>
 
           {/* Informações do Cliente */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-6">
-            <div className="flex items-start gap-3">
-              <User className="w-5 h-5 text-gray-600 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-600">Cliente</p>
-                <p className="font-semibold text-gray-900">{cart.customerName}</p>
-              </div>
-            </div>
+          <div className="bg-gray-50 rounded-lg p-6 space-y-4">
 
-            <div className="flex items-start gap-3">
-              <Phone className="w-5 h-5 text-gray-600 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-600">Telefone</p>
-                <p className="font-semibold text-gray-900">{cart.phone}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              {cart.deliveryMethod === 'delivery' ? (
-                <Home className="w-5 h-5 text-gray-600 mt-0.5" />
-              ) : (
-                <Store className="w-5 h-5 text-gray-600 mt-0.5" />
-              )}
-              <div>
-                <p className="text-sm text-gray-600">Método de Entrega</p>
-                <p className="font-semibold text-gray-900">
-                  {cart.deliveryMethod === 'delivery' ? 'Entrega em casa' : 'Retirar no estabelecimento'}
-                </p>
-              </div>
-            </div>
-
-            {cart.deliveryMethod === 'delivery' && cart.address && (
+            {/* Linha 1: Cliente | Telefone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
-                <Home className="w-5 h-5 text-gray-600 mt-0.5" />
+                <User className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm text-gray-600">Endereço de Entrega</p>
-                  <p className="font-semibold text-gray-900">{cart.address}</p>
+                  <p className="text-sm text-gray-600">Cliente</p>
+                  <p className="font-semibold text-gray-900">{cart.customerName}</p>
                 </div>
               </div>
-            )}
+              <div className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-600">Telefone</p>
+                  <p className="font-semibold text-gray-900">{cart.phone}</p>
+                </div>
+              </div>
+            </div>
 
+            {/* Linha 2: Método de Entrega | Endereço */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3">
+                {cart.deliveryMethod === 'delivery' ? (
+                  <Home className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                ) : (
+                  <Store className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                )}
+                <div>
+                  <p className="text-sm text-gray-600">Método de Entrega</p>
+                  <p className="font-semibold text-gray-900">
+                    {cart.deliveryMethod === 'delivery' ? 'Entrega em casa' : 'Retirar no estabelecimento'}
+                  </p>
+                </div>
+              </div>
+              {cart.deliveryMethod === 'delivery' && cart.address && (
+                <div className="flex items-start gap-3">
+                  <Home className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-600">Endereço de Entrega</p>
+                    <p className="font-semibold text-gray-900">{cart.address}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Observações de Entrega (largura total, só se existir) */}
             {cart.deliveryNote && (
-              <div className="flex items-start gap-3 md:col-span-2">
-                <FileText className="w-5 h-5 text-gray-600 mt-0.5" />
+              <div className="flex items-start gap-3">
+                <FileText className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm text-gray-600">Observações de Entrega</p>
                   <p className="font-semibold text-gray-900 whitespace-pre-wrap">{cart.deliveryNote}</p>
@@ -191,61 +197,54 @@ export default function CarrinhoPublico() {
               </div>
             )}
 
-            {cart.note && (
-              <div className="flex items-start gap-3 md:col-span-2">
-                <MessageSquare className="w-5 h-5 text-gray-600 mt-0.5" />
+            <div className="border-t border-gray-200" />
+
+            {/* Linha 3: Data | Forma de Pagamento */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3">
+                <Calendar className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm text-gray-600">Mensagem ao Destinatário</p>
-                  <p className="font-semibold text-gray-900 whitespace-pre-wrap">{cart.note}</p>
+                  <p className="text-sm text-gray-600">Data do pedido</p>
+                  <p className="font-semibold text-gray-900">
+                    {new Date(cart.createdAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
                 </div>
               </div>
-            )}
-
-            <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-gray-600 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-600">Data do pedido</p>
-                <p className="font-semibold text-gray-900">
-                  {new Date(cart.createdAt).toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
+              {cart.paymentMethod && (
+                <div className="flex items-start gap-3">
+                  {cart.paymentMethod === 'cash' ? (
+                    <Banknote className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                  ) : (
+                    <CreditCard className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                  )}
+                  <div>
+                    <p className="text-sm text-gray-600">Forma de Pagamento</p>
+                    <p className="font-semibold text-gray-900">
+                      {cart.paymentMethod === 'pix' && 'PIX'}
+                      {cart.paymentMethod === 'credit_card' && 'Cartão de Crédito'}
+                      {cart.paymentMethod === 'debit_card' && 'Cartão de Débito'}
+                      {cart.paymentMethod === 'cash' && 'Dinheiro'}
+                    </p>
+                    {cart.paymentMethod === 'cash' && cart.needsChange && cart.changeFor && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        Troco para: <span className="font-semibold text-gray-900">R$ {cart.changeFor.toFixed(2).replace('.', ',')}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Forma de Pagamento */}
-            {cart.paymentMethod && (
-              <div className="flex items-start gap-3">
-                {cart.paymentMethod === 'cash' ? (
-                  <Banknote className="w-5 h-5 text-gray-600 mt-0.5" />
-                ) : (
-                  <CreditCard className="w-5 h-5 text-gray-600 mt-0.5" />
-                )}
-                <div>
-                  <p className="text-sm text-gray-600">Forma de Pagamento</p>
-                  <p className="font-semibold text-gray-900">
-                    {cart.paymentMethod === 'pix' && 'PIX'}
-                    {cart.paymentMethod === 'credit_card' && 'Cartão de Crédito'}
-                    {cart.paymentMethod === 'debit_card' && 'Cartão de Débito'}
-                    {cart.paymentMethod === 'cash' && 'Dinheiro'}
-                  </p>
-                  {cart.paymentMethod === 'cash' && cart.needsChange && cart.changeFor && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      Troco para: <span className="font-semibold text-gray-900">R$ {cart.changeFor.toFixed(2).replace('.', ',')}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Destinatário */}
+            {/* Destinatário (largura total, só se existir) */}
             {cart.recipientName && (
               <div className="flex items-start gap-3">
-                <Users className="w-5 h-5 text-gray-600 mt-0.5" />
+                <Users className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm text-gray-600">Destinatário</p>
                   <p className="font-semibold text-gray-900">{cart.recipientName}</p>
@@ -255,6 +254,18 @@ export default function CarrinhoPublico() {
                 </div>
               </div>
             )}
+
+            {/* Mensagem ao Destinatário (largura total, só se existir) */}
+            {cart.note && (
+              <div className="flex items-start gap-3">
+                <MessageSquare className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-600">Mensagem ao Destinatário</p>
+                  <p className="font-semibold text-gray-900 whitespace-pre-wrap">{cart.note}</p>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
 
