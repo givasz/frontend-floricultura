@@ -20,7 +20,10 @@ export default function Checkout() {
   // Etapa 1: Dados do Cliente
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
-  const [note, setNote] = useState('');
+  const [recipientMessage, setRecipientMessage] = useState('');
+
+  // Etapa 2: Entrega (observações)
+  const [deliveryNote, setDeliveryNote] = useState('');
 
   // Etapa 2: Entrega
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
@@ -141,11 +144,21 @@ export default function Checkout() {
     setLoading(true);
 
     try {
+      // Montar campo note combinando observações de entrega e mensagem ao destinatário
+      const noteParts: string[] = [];
+      if (deliveryNote.trim()) {
+        noteParts.push(`Obs. de entrega: ${deliveryNote.trim()}`);
+      }
+      if (recipientMessage.trim()) {
+        noteParts.push(`Mensagem ao destinatário: ${recipientMessage.trim()}`);
+      }
+      const combinedNote = noteParts.join('\n\n');
+
       // Criar carrinho
       const cartData = {
         customerName: customerName.trim(),
         phone: phone.trim(),
-        note: note.trim(),
+        note: combinedNote,
         deliveryMethod,
         address: deliveryMethod === 'delivery' ? address.trim() : undefined,
         items: items.map(item => ({
@@ -346,6 +359,20 @@ export default function Checkout() {
                     </div>
                   )}
 
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Observações <span className="text-gray-400 font-normal">(opcional)</span>
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Instruções especiais para a entrega.</p>
+                    <textarea
+                      value={deliveryNote}
+                      onChange={(e) => setDeliveryNote(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all resize-none"
+                      rows={3}
+                      placeholder="Ex: Entregar até 18h • Ligar antes de chegar • Deixar com o porteiro • Não bater campainha"
+                    />
+                  </div>
+
                   <button
                     onClick={handleNextStep}
                     className="w-full bg-[rgb(254,0,0)] text-white px-6 py-4 rounded-xl font-bold text-lg hover:bg-[rgb(220,0,0)] transition-all flex items-center justify-center gap-2"
@@ -399,15 +426,16 @@ export default function Checkout() {
                   </div>
 
                   <div className="border-t border-gray-200 pt-6">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Observações (opcional)
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Mensagem ao Destinatário <span className="text-gray-400 font-normal">(opcional)</span>
                     </label>
+                    <p className="text-xs text-gray-500 mb-2">Mensagem que será incluída no arranjo/cartão para o destinatário.</p>
                     <textarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
+                      value={recipientMessage}
+                      onChange={(e) => setRecipientMessage(e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-[rgb(254,0,0)] transition-all resize-none"
                       rows={3}
-                      placeholder="Ex: Entregar até 18h, incluir cartão..."
+                      placeholder="Ex: Feliz aniversário! Com amor e carinho..."
                     />
                   </div>
 
