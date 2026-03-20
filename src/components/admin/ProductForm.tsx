@@ -10,7 +10,29 @@ interface ProductFormProps {
   onClose: () => void;
 }
 
+function formatToBRL(digits: string): string {
+  if (!digits) return '';
+  const padded = digits.padStart(3, '0');
+  const cents = padded.slice(-2);
+  const reais = padded.slice(0, -2).replace(/^0+/, '') || '0';
+  const reaisFormatted = Number(reais).toLocaleString('pt-BR');
+  return `${reaisFormatted},${cents}`;
+}
+
+function parseBRL(value: string): number {
+  if (!value) return 0;
+  return parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
+}
+
+function priceToDisplay(price: number): string {
+  if (!price) return '';
+  return price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 export default function ProductForm({ product, categories, onSubmit, onClose }: ProductFormProps) {
+  const [priceDisplay, setPriceDisplay] = useState<string>(
+    product?.price ? priceToDisplay(product.price) : ''
+  );
   const [formData, setFormData] = useState({
     name: product?.name || '',
     description: product?.description || '',
@@ -20,6 +42,13 @@ export default function ProductForm({ product, categories, onSubmit, onClose }: 
     active: product?.active !== undefined ? product.active : true
   });
   const [loading, setLoading] = useState(false);
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    const formatted = formatToBRL(digits);
+    setPriceDisplay(formatted);
+    setFormData({ ...formData, price: parseBRL(formatted) });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,11 +111,11 @@ export default function ProductForm({ product, categories, onSubmit, onClose }: 
               Preço (R$)
             </label>
             <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.price || ''}
-              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+              type="text"
+              inputMode="numeric"
+              value={priceDisplay}
+              onChange={handlePriceChange}
+              placeholder="0,00"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
               required
             />
