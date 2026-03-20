@@ -86,7 +86,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
         showToast('Informe o valor do troco', 'error');
         hasError = true;
       } else if (changeValue < total) {
-        showToast(`O valor do troco não pode ser menor que o total (R$ ${total.toFixed(2)})`, 'error');
+        showToast(`O valor do troco não pode ser menor que o total (R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, 'error');
         hasError = true;
       }
     }
@@ -133,11 +133,11 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
 
         // Adicionar cada produto com quantidade e preço
         items.forEach(item => {
-          const itemTotal = (item.product.price * item.quantity).toFixed(2).replace('.', ',');
+          const itemTotal = (item.product.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           message += `• ${item.quantity}x ${item.product.name} - R$ ${itemTotal}\n`;
         });
 
-        message += `\n💰 *Total: R$ ${getTotalPrice().toFixed(2).replace('.', ',')}*\n\n`;
+        message += `\n💰 *Total: R$ ${getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}*\n\n`;
         const linkToUse = finalizeResp.link || response.link;
         message += `Link completo do pedido:\n${linkToUse}`;
 
@@ -197,7 +197,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
               <div>
                 <h2 className="text-2xl font-bold">Finalizar Pedido</h2>
                 <p className="text-sm text-white/90 mt-1">
-                  Total: R$ {getTotalPrice().toFixed(2).replace('.', ',')}
+                  Total: R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
               <button
@@ -353,7 +353,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                       {item.quantity}x {item.product.name}
                     </span>
                     <span className="font-semibold text-gray-900">
-                      R$ {(item.product.price * item.quantity).toFixed(2).replace('.', ',')}
+                      R$ {(item.product.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 ))}
@@ -367,7 +367,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-gray-900">Total:</span>
                   <span className="text-xl font-bold text-[rgb(254,0,0)]">
-                    R$ {getTotalPrice().toFixed(2).replace('.', ',')}
+                    R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>

@@ -109,7 +109,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         </div>
 
                         <p className="text-lg font-bold text-[rgb(254,0,0)] mb-3">
-                          R$ {(item.product.price * item.quantity).toFixed(2).replace('.', ',')}
+                          R$ {(item.product.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
 
                         {/* Quantidade */}
@@ -145,14 +145,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-gray-600">Subtotal:</span>
                     <span className="font-semibold text-gray-900">
-                      R$ {getTotalPrice().toFixed(2).replace('.', ',')}
+                      R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <div className="border-t border-gray-300 pt-3 mt-3">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-bold text-gray-900">Total:</span>
                       <span className="text-2xl font-bold text-[rgb(254,0,0)]">
-                        R$ {getTotalPrice().toFixed(2).replace('.', ',')}
+                        R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>

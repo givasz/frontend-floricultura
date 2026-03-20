@@ -233,7 +233,7 @@ export default function CarrinhoPublico() {
                     </p>
                     {cart.paymentMethod === 'cash' && cart.needsChange && cart.changeFor && (
                       <p className="text-sm text-gray-600 mt-1">
-                        Troco para: <span className="font-semibold text-gray-900">R$ {cart.changeFor.toFixed(2).replace('.', ',')}</span>
+                        Troco para: <span className="font-semibold text-gray-900">R$ {cart.changeFor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </p>
                     )}
                   </div>
@@ -304,7 +304,7 @@ export default function CarrinhoPublico() {
                       Quantidade: <span className="font-semibold text-gray-900">{item.qty}</span>
                     </span>
                     <span className="text-sm text-gray-600">
-                      Preço unitário: <span className="font-semibold text-gray-900">R$ {item.price.toFixed(2).replace('.', ',')}</span>
+                      Preço unitário: <span className="font-semibold text-gray-900">R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </span>
                   </div>
                 </div>
@@ -312,7 +312,7 @@ export default function CarrinhoPublico() {
                 {/* Total do Item */}
                 <div className="flex items-center">
                   <span className="text-xl font-bold text-[rgb(254,0,0)]">
-                    R$ {(item.price * item.qty).toFixed(2).replace('.', ',')}
+                    R$ {(item.price * item.qty).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
@@ -325,7 +325,7 @@ export default function CarrinhoPublico() {
           <div className="flex items-center justify-between text-2xl font-bold">
             <span className="text-gray-700">Total do Pedido:</span>
             <span className="text-[rgb(254,0,0)]">
-              R$ {total.toFixed(2).replace('.', ',')}
+              R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
         </div>

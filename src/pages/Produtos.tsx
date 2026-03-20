@@ -196,7 +196,7 @@ export default function Produtos() {
 
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl font-bold text-[rgb(254,0,0)]">
-                          R$ {product.price.toFixed(2).replace('.', ',')}
+                          R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
 

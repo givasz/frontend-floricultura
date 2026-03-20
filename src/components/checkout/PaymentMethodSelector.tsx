@@ -26,7 +26,7 @@ export function PaymentMethodSelector({
   const handleChangeForBlur = () => {
     const numValue = parseFloat(changeFor);
     if (needsChange && changeFor && numValue < cartTotal) {
-      setChangeError(`O valor do troco não pode ser menor que o total do pedido (R$ ${cartTotal.toFixed(2)})`);
+      setChangeError(`O valor do troco não pode ser menor que o total do pedido (R$ ${cartTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`);
     } else {
       setChangeError('');
     }
@@ -127,11 +127,11 @@ export function PaymentMethodSelector({
                 onBlur={handleChangeForBlur}
                 step="0.01"
                 min={cartTotal}
-                placeholder={`Mínimo: R$ ${cartTotal.toFixed(2)}`}
+                placeholder={`Mínimo: R$ ${cartTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Total do pedido: R$ {cartTotal.toFixed(2)}
+                Total do pedido: R$ {cartTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
               {changeError && (
                 <p className="mt-1 text-sm text-red-600">{changeError}</p>

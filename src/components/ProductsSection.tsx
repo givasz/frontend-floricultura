@@ -166,7 +166,7 @@ export default function ProductsSection() {
                 {/* Área de Preços */}
                 <div className="flex items-center gap-2.5 mb-4 flex-wrap">
                   <span className="text-xl lg:text-2xl font-bold text-[rgb(254,0,0)] tracking-tight">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
+                    R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
 

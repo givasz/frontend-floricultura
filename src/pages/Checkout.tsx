@@ -118,7 +118,7 @@ export default function Checkout() {
         showToast('Informe o valor do troco', 'error');
         hasError = true;
       } else if (changeValue < total) {
-        showToast(`O valor do troco não pode ser menor que o total (R$ ${total.toFixed(2)})`, 'error');
+        showToast(`O valor do troco não pode ser menor que o total (R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, 'error');
         hasError = true;
       }
     }
@@ -181,11 +181,11 @@ export default function Checkout() {
         message += `📦 *Pedido de ${customerName.trim()}*\n\n`;
 
         items.forEach(item => {
-          const itemTotal = (item.product.price * item.quantity).toFixed(2).replace('.', ',');
+          const itemTotal = (item.product.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           message += `• ${item.quantity}x ${item.product.name} - R$ ${itemTotal}\n`;
         });
 
-        message += `\n💰 *Total: R$ ${getTotalPrice().toFixed(2).replace('.', ',')}*\n\n`;
+        message += `\n💰 *Total: R$ ${getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}*\n\n`;
         const linkToUse = finalizeResp.link || response.link;
         message += `Link completo do pedido:\n${linkToUse}`;
 
@@ -463,10 +463,10 @@ export default function Checkout() {
                         {item.product.name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {item.quantity}x R$ {item.product.price.toFixed(2).replace('.', ',')}
+                        {item.quantity}x R$ {item.product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                       <p className="text-sm font-bold text-[rgb(254,0,0)]">
-                        R$ {(item.product.price * item.quantity).toFixed(2).replace('.', ',')}
+                        R$ {(item.product.price * item.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     </div>
                   </div>
@@ -477,13 +477,13 @@ export default function Checkout() {
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-gray-600">Subtotal:</span>
                   <span className="font-semibold text-gray-900">
-                    R$ {getTotalPrice().toFixed(2).replace('.', ',')}
+                    R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">Total:</span>
                   <span className="text-2xl font-bold text-[rgb(254,0,0)]">
-                    R$ {getTotalPrice().toFixed(2).replace('.', ',')}
+                    R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>

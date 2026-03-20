@@ -441,7 +441,7 @@ export default function PainelAdmin() {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          R$ {product.price.toFixed(2)}
+                          R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
                           <div className="flex flex-wrap gap-1">
@@ -606,7 +606,7 @@ export default function PainelAdmin() {
                           <td className="px-6 py-4 text-sm text-gray-900">{cart.customerName}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cart.phone}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            R$ {total.toFixed(2)}
+                            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {new Date(cart.createdAt).toLocaleDateString('pt-BR')}
