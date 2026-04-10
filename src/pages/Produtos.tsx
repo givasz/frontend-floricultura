@@ -6,7 +6,7 @@ import { Product, Category, Pagination as PaginationType } from '../types';
 import { useCart } from '../contexts/CartContext';
 import Loading from '../components/Loading';
 import Pagination from '../components/Pagination';
-import { getImageUrl } from '../utils/imageUrl';
+import ProductImageCarousel from '../components/ProductImageCarousel';
 
 export default function Produtos() {
   const [searchParams] = useSearchParams();
@@ -161,18 +161,7 @@ export default function Produtos() {
                     className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
                     {/* Imagem */}
-                    <div className="relative aspect-square overflow-hidden bg-gray-100">
-                      <img
-                        src={getImageUrl(
-                          product.images && product.images.length > 0
-                            ? product.images[0].imageUrl
-                            : product.imageUrl
-                        )}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
+                    <ProductImageCarousel product={product} />
 
                     {/* Conteúdo */}
                     <div className="p-5">

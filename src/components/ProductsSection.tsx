@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import { Product, Pagination as PaginationType } from '../types';
 import { useCart } from '../contexts/CartContext';
 import Loading from './Loading';
-import { getImageUrl } from '../utils/imageUrl';
+import ProductImageCarousel from './ProductImageCarousel';
 
 export default function ProductsSection() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -102,41 +102,7 @@ export default function ProductsSection() {
               className="group bg-white rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-400 cursor-pointer"
             >
               {/* Container da Imagem */}
-              <div className="relative aspect-square overflow-hidden bg-gray-100">
-                {(() => {
-                  // Prioriza o array de imagens, senão usa imageUrl
-                  const images = product.images && product.images.length > 0
-                    ? product.images.map(img => img.imageUrl)
-                    : product.imageUrl ? [product.imageUrl] : [];
-
-                  const imageToShow = images[0] || '';
-                  const hasMultipleImages = images.length > 1;
-
-                  return (
-                    <>
-                      <img
-                        src={getImageUrl(imageToShow)}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        loading="lazy"
-                      />
-
-                      {/* Indicador de múltiplas imagens */}
-                      {hasMultipleImages && (
-                        <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                          </svg>
-                          {images.length}
-                        </div>
-                      )}
-
-                      {/* Overlay no Hover */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
-                    </>
-                  );
-                })()}
-              </div>
+              <ProductImageCarousel product={product} />
 
               {/* Conteúdo do Card */}
               <div className="p-5 lg:p-6">
