@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { Category, Pagination as PaginationType } from '../types';
 import Loading from './Loading';
 import Pagination from './Pagination';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function CategoriesSection() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -113,21 +114,20 @@ export default function CategoriesSection() {
             >
               {category.imageUrl && (
                 <img
-                  src={category.imageUrl}
+                  src={getImageUrl(category.imageUrl)}
                   alt={category.name}
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               )}
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/40 group-hover:from-[rgba(254,0,0,0.9)] group-hover:via-[rgba(254,0,0,0.5)] transition-all duration-300" />
 
               <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-6">
-                {!category.imageUrl && (
-                  <div className="text-5xl mb-4">
-                    {getIconForCategory(category.name)}
-                  </div>
-                )}
+                <div className="text-5xl mb-4">
+                  {getIconForCategory(category.name)}
+                </div>
                 <h3 className="text-2xl lg:text-3xl font-bold mb-2">
                   {category.name}
                 </h3>

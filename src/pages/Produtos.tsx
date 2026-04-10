@@ -103,13 +103,13 @@ export default function Produtos() {
 
         {/* Filtro de Categorias */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-3">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <button
               onClick={() => handleCategoryChange('')}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
+              className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 border ${
                 selectedCategory === ''
-                  ? 'bg-[rgb(254,0,0)] text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? 'bg-[rgb(254,0,0)] text-white border-[rgb(254,0,0)] shadow-md'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-[rgb(254,0,0)] hover:text-[rgb(254,0,0)]'
               }`}
             >
               Todas
@@ -118,10 +118,10 @@ export default function Produtos() {
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category.id.toString())}
-                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 border ${
                   selectedCategory === category.id.toString()
-                    ? 'bg-[rgb(254,0,0)] text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                    ? 'bg-[rgb(254,0,0)] text-white border-[rgb(254,0,0)] shadow-md'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-[rgb(254,0,0)] hover:text-[rgb(254,0,0)]'
                 }`}
               >
                 {category.name}
@@ -163,7 +163,11 @@ export default function Produtos() {
                     {/* Imagem */}
                     <div className="relative aspect-square overflow-hidden bg-gray-100">
                       <img
-                        src={getImageUrl(product.imageUrl)}
+                        src={getImageUrl(
+                          product.images && product.images.length > 0
+                            ? product.images[0].imageUrl
+                            : product.imageUrl
+                        )}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
