@@ -10,12 +10,12 @@ interface ProductImageCarouselProps {
 export default function ProductImageCarousel({ product }: ProductImageCarouselProps) {
   const [current, setCurrent] = useState(0);
 
-  const images: string[] =
-    product.images && product.images.length > 0
-      ? product.images.map((img) => img.imageUrl)
-      : product.imageUrl
-      ? [product.imageUrl]
-      : [];
+  // Mescla imageUrl (capa) + product.images, sem duplicatas
+  const extraImages = product.images?.map((img) => img.imageUrl) ?? [];
+  const images: string[] = [
+    ...(product.imageUrl && !extraImages.includes(product.imageUrl) ? [product.imageUrl] : []),
+    ...extraImages,
+  ];
 
   const total = images.length;
 
