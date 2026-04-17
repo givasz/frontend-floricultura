@@ -49,17 +49,18 @@ export default function ProductImageCarousel({ product }: ProductImageCarouselPr
 
       {total > 1 && (
         <>
-          {/* Setas — aparecem no hover */}
+          {/* Setas — sempre visíveis */}
           <button
             onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white rounded-full p-1 opacity-0 group-hover/carousel:opacity-100 transition-opacity z-10"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-1 opacity-70 hover:opacity-100 hover:scale-110 transition-all z-10"
             aria-label="Imagem anterior"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
+
           <button
             onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white rounded-full p-1 opacity-0 group-hover/carousel:opacity-100 transition-opacity z-10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-1 opacity-70 hover:opacity-100 hover:scale-110 transition-all z-10"
             aria-label="Próxima imagem"
           >
             <ChevronRight className="w-4 h-4" />
