@@ -14,7 +14,7 @@ export default function TestimonialsSection() {
     },
     {
       stars: 5,
-      text: '39 anos de tradição fazem toda a diferença. O atendimento é excelente e os produtos são lindos e de qualidade!',
+      text: '40 anos de tradição fazem toda a diferença. O atendimento é excelente e os produtos são lindos e de qualidade!',
       name: 'Ana Costa',
       location: 'Calhau, São Luís'
     }
@@ -24,7 +24,7 @@ export default function TestimonialsSection() {
     <section id="depoimentos" className="bg-white py-16 lg:py-28 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl lg:text-5xl font-bold text-center text-[var(--texto-escuro)] mb-12 lg:mb-16">
-          Milhares de Clientes Satisfeitos em 39 Anos
+          Milhares de Clientes Satisfeitos em 40 Anos
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -91,11 +91,9 @@ export default function PainelAdmin() {
   const handleLogin = async (email: string, password: string) => {
     try {
       const { adminRoute } = await api.admin.login(email, password);
-      // Gerar base64 das credenciais para Basic Auth (não expõe senha diretamente)
       const credentials = btoa(`${email}:${password}`);
       localStorage.setItem('adminCredentials', credentials);
       localStorage.setItem('adminRoute', adminRoute);
-      // Testar autenticação fazendo uma requisição para garantir que credenciais estão válidas
       await api.getCategories();
       setIsAuthenticated(true);
       showToast('Login realizado com sucesso!', 'success');
@@ -163,7 +161,6 @@ export default function PainelAdmin() {
 
   const handleDeleteProduct = async (id: number) => {
     if (!confirm('Tem certeza que deseja deletar este produto?')) return;
-
     try {
       await api.admin.deleteProduct(id);
       showToast('Produto deletado com sucesso!', 'success');
@@ -212,7 +209,6 @@ export default function PainelAdmin() {
 
   const handleDeleteCategory = async (id: number) => {
     if (!confirm('Tem certeza que deseja deletar esta categoria?')) return;
-
     try {
       await api.admin.deleteCategory(id);
       showToast('Categoria deletada com sucesso!', 'success');
@@ -236,18 +232,9 @@ export default function PainelAdmin() {
     }
   };
 
-  // Funções de mudança de página
-  const handleProductsPageChange = (page: number) => {
-    setProductsPage(page);
-  };
-
-  const handleCategoriesPageChange = (page: number) => {
-    setCategoriesPage(page);
-  };
-
-  const handleCartsPageChange = (page: number) => {
-    setCartsPage(page);
-  };
+  const handleProductsPageChange = (page: number) => setProductsPage(page);
+  const handleCategoriesPageChange = (page: number) => setCategoriesPage(page);
+  const handleCartsPageChange = (page: number) => setCartsPage(page);
 
   // Funções de Configurações
   const loadConfig = async () => {
@@ -267,7 +254,6 @@ export default function PainelAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
     await handleUploadHero(file);
-    // limpa o input
     e.currentTarget.value = '';
   };
 
@@ -278,7 +264,6 @@ export default function PainelAdmin() {
       setHeroImageUrl(res.imageUrl);
       setSiteConfig(res.config);
       showToast('Imagem enviada com sucesso!', 'success');
-      // recarregar configurações do servidor para garantir estado consistente
       loadConfig();
     } catch (error) {
       showToast('Erro ao enviar imagem', 'error');
@@ -289,12 +274,10 @@ export default function PainelAdmin() {
 
   const handleUpdateConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!heroImageUrl.trim()) {
       showToast('URL da imagem é obrigatória', 'error');
       return;
     }
-
     try {
       await api.admin.updateSiteConfig({ heroImageUrl });
       showToast('Configurações atualizadas com sucesso!', 'success');
@@ -308,96 +291,79 @@ export default function PainelAdmin() {
     return <AdminLogin onLogin={handleLogin} />;
   }
 
+  // ─── Helpers de formatação ────────────────────────────────────────────────
+  const fmtPrice = (v: number) =>
+    `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {ToastComponent}
 
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Painel Administrativo - Flor de Maio
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <h1 className="font-bold text-gray-900 truncate text-base sm:text-xl lg:text-2xl">
+              <span className="sm:hidden">⚙️ Admin</span>
+              <span className="hidden sm:inline">Painel Administrativo – Flor de Maio</span>
             </h1>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm whitespace-nowrap"
             >
               <LogOut className="w-4 h-4" />
-              Sair
+              <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Tabs */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-4 py-4 border-b-2 font-medium transition-colors ${
-                activeTab === 'products'
-                  ? 'border-[rgb(254,0,0)] text-[rgb(254,0,0)]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Package className="w-5 h-5" />
-              Produtos
-            </button>
-            <button
-              onClick={() => setActiveTab('categories')}
-              className={`flex items-center gap-2 px-4 py-4 border-b-2 font-medium transition-colors ${
-                activeTab === 'categories'
-                  ? 'border-[rgb(254,0,0)] text-[rgb(254,0,0)]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <FolderOpen className="w-5 h-5" />
-              Categorias
-            </button>
-            <button
-              onClick={() => setActiveTab('carts')}
-              className={`flex items-center gap-2 px-4 py-4 border-b-2 font-medium transition-colors ${
-                activeTab === 'carts'
-                  ? 'border-[rgb(254,0,0)] text-[rgb(254,0,0)]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <ShoppingCart className="w-5 h-5" />
-              Carrinhos
-            </button>
-            <button
-              onClick={() => setActiveTab('config')}
-              className={`flex items-center gap-2 px-4 py-4 border-b-2 font-medium transition-colors ${
-                activeTab === 'config'
-                  ? 'border-[rgb(254,0,0)] text-[rgb(254,0,0)]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Settings className="w-5 h-5" />
-              Configurações
-            </button>
+      {/* ── Tabs ───────────────────────────────────────────────────────────── */}
+      <div className="bg-white border-b sticky top-[53px] sm:top-[65px] z-10">
+        <div className="max-w-7xl mx-auto">
+          {/* overflow-x-auto p/ scroll horizontal no mobile */}
+          <div className="flex overflow-x-auto scrollbar-none">
+            {(
+              [
+                { key: 'products',   icon: <Package className="w-4 h-4 sm:w-5 sm:h-5" />,     label: 'Produtos'       },
+                { key: 'categories', icon: <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" />,  label: 'Categorias'     },
+                { key: 'carts',      icon: <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />,label: 'Carrinhos'      },
+                { key: 'config',     icon: <Settings className="w-4 h-4 sm:w-5 sm:h-5" />,    label: 'Configurações'  },
+              ] as const
+            ).map(({ key, icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-3 sm:py-4 border-b-2 font-medium transition-colors whitespace-nowrap text-sm sm:text-base flex-shrink-0 ${
+                  activeTab === key
+                    ? 'border-[rgb(254,0,0)] text-[rgb(254,0,0)]'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {icon}
+                <span>{label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tab: Produtos */}
+      {/* ── Content ────────────────────────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+
+        {/* ════════════════ Tab: Produtos ════════════════ */}
         {activeTab === 'products' && (
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Gerenciar Produtos</h2>
+            {/* Cabeçalho da seção */}
+            <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gerenciar Produtos</h2>
               <button
-                onClick={() => {
-                  setEditingProduct(undefined);
-                  setShowProductForm(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors"
+                onClick={() => { setEditingProduct(undefined); setShowProductForm(true); }}
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors text-sm sm:text-base whitespace-nowrap"
               >
-                <Plus className="w-5 h-5" />
-                Novo Produto
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="sm:hidden">Novo</span>
+                <span className="hidden sm:inline">Novo Produto</span>
               </button>
             </div>
 
@@ -405,105 +371,171 @@ export default function PainelAdmin() {
               <Loading />
             ) : (
               <div className="bg-white rounded-xl shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Imagem</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preço</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {products.map((product) => (
-                      <tr key={product.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
-                            {product.imageUrl ? (
-                              <img
-                                src={`${import.meta.env.VITE_API_URL}${product.imageUrl}`} 
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // Fallback caso a imagem não carregue
-                                  e.currentTarget.onerror = null;
-                                  e.currentTarget.src = "https://placehold.co/100?text=Sem+Foto";
-                                }}
-                              />
-                            ) : (
-                              <Images className="w-6 h-6 text-gray-400" />
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
-                          <div className="flex flex-wrap gap-1">
-                            {product.categories && product.categories.length > 0 ? (
-                              product.categories.map((pc) => (
-                                <span
-                                  key={pc.id}
-                                  className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium"
-                                >
-                                  {pc.category.name}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-gray-400 italic">Sem categoria</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+
+                {/* ── Mobile: cards ───────────────────────── */}
+                <div className="sm:hidden divide-y divide-gray-100">
+                  {products.map((product) => (
+                    <div key={product.id} className="p-3 flex gap-3 items-start">
+                      {/* Thumbnail */}
+                      <div className="w-14 h-14 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 flex items-center justify-center">
+                        {product.imageUrl ? (
+                          <img
+                            src={`${import.meta.env.VITE_API_URL}${product.imageUrl}`}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = 'https://placehold.co/100?text=Sem+Foto';
+                            }}
+                          />
+                        ) : (
+                          <Images className="w-6 h-6 text-gray-400" />
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-1 mb-0.5">
+                          <p className="font-semibold text-sm text-gray-900 leading-tight">{product.name}</p>
                           <button
                             onClick={() => handleToggleProduct(product.id)}
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              product.active
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
+                            className={`flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ml-1 ${
+                              product.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                             }`}
                           >
                             {product.active ? 'Ativo' : 'Inativo'}
                           </button>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            onClick={() => {
-                              setManagingImagesProduct(product);
-                              setShowProductImages(true);
-                            }}
-                            className="text-purple-600 hover:text-purple-900 mr-3"
-                            title="Gerenciar imagens"
-                          >
-                            <Images className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditingProduct(product);
-                              setShowProductForm(true);
-                            }}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
-                            title="Editar produto"
-                          >
-                            <Edit className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Deletar produto"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </td>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">{fmtPrice(product.price)}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {product.categories && product.categories.length > 0 ? (
+                            product.categories.map((pc) => (
+                              <span key={pc.id} className="inline-block px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                                {pc.category.name}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-400 italic text-xs">Sem categoria</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Ações */}
+                      <div className="flex flex-col gap-2.5 flex-shrink-0 pt-0.5">
+                        <button
+                          onClick={() => { setManagingImagesProduct(product); setShowProductImages(true); }}
+                          className="text-purple-600 hover:text-purple-900"
+                          title="Gerenciar imagens"
+                        >
+                          <Images className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => { setEditingProduct(product); setShowProductForm(true); }}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Editar"
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Deletar"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ── Desktop: tabela ─────────────────────── */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Imagem</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preço</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {products.map((product) => (
+                        <tr key={product.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
+                              {product.imageUrl ? (
+                                <img
+                                  src={`${import.meta.env.VITE_API_URL}${product.imageUrl}`}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = 'https://placehold.co/100?text=Sem+Foto';
+                                  }}
+                                />
+                              ) : (
+                                <Images className="w-6 h-6 text-gray-400" />
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{product.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fmtPrice(product.price)}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            <div className="flex flex-wrap gap-1">
+                              {product.categories && product.categories.length > 0 ? (
+                                product.categories.map((pc) => (
+                                  <span key={pc.id} className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                                    {pc.category.name}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-gray-400 italic">Sem categoria</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => handleToggleProduct(product.id)}
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                product.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {product.active ? 'Ativo' : 'Inativo'}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button
+                              onClick={() => { setManagingImagesProduct(product); setShowProductImages(true); }}
+                              className="text-purple-600 hover:text-purple-900 mr-3"
+                              title="Gerenciar imagens"
+                            >
+                              <Images className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => { setEditingProduct(product); setShowProductForm(true); }}
+                              className="text-blue-600 hover:text-blue-900 mr-3"
+                              title="Editar produto"
+                            >
+                              <Edit className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-600 hover:text-red-900"
+                              title="Deletar produto"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -513,20 +545,18 @@ export default function PainelAdmin() {
           </div>
         )}
 
-        {/* Tab: Categorias */}
+        {/* ════════════════ Tab: Categorias ════════════════ */}
         {activeTab === 'categories' && (
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Gerenciar Categorias</h2>
+            <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gerenciar Categorias</h2>
               <button
-                onClick={() => {
-                  setEditingCategory(undefined);
-                  setShowCategoryForm(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors"
+                onClick={() => { setEditingCategory(undefined); setShowCategoryForm(true); }}
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors text-sm sm:text-base whitespace-nowrap"
               >
-                <Plus className="w-5 h-5" />
-                Nova Categoria
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="sm:hidden">Nova</span>
+                <span className="hidden sm:inline">Nova Categoria</span>
               </button>
             </div>
 
@@ -534,40 +564,69 @@ export default function PainelAdmin() {
               <Loading />
             ) : (
               <div className="bg-white rounded-xl shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {categories.map((category) => (
-                      <tr key={category.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{category.id}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{category.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            onClick={() => {
-                              setEditingCategory(category);
-                              setShowCategoryForm(true);
-                            }}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
-                          >
-                            <Edit className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCategory(category.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </td>
+
+                {/* ── Mobile: cards ───────────────────────── */}
+                <div className="sm:hidden divide-y divide-gray-100">
+                  {categories.map((category) => (
+                    <div key={category.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-400 mb-0.5">#{category.id}</p>
+                        <p className="font-medium text-sm text-gray-900 truncate">{category.name}</p>
+                      </div>
+                      <div className="flex gap-4 flex-shrink-0">
+                        <button
+                          onClick={() => { setEditingCategory(category); setShowCategoryForm(true); }}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Editar"
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Deletar"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ── Desktop: tabela ─────────────────────── */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {categories.map((category) => (
+                        <tr key={category.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{category.id}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{category.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button
+                              onClick={() => { setEditingCategory(category); setShowCategoryForm(true); }}
+                              className="text-blue-600 hover:text-blue-900 mr-3"
+                            >
+                              <Edit className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCategory(category.id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -577,55 +636,90 @@ export default function PainelAdmin() {
           </div>
         )}
 
-        {/* Tab: Carrinhos */}
+        {/* ════════════════ Tab: Carrinhos ════════════════ */}
         {activeTab === 'carts' && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Carrinhos Criados</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Carrinhos Criados</h2>
 
             {loadingCarts ? (
               <Loading />
             ) : (
               <div className="bg-white rounded-xl shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Link</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {carts.map((cart) => {
-                      const total = cart.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                      return (
-                        <tr key={cart.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{cart.uid}</td>
-                          <td className="px-6 py-4 text-sm text-gray-900">{cart.customerName}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cart.phone}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(cart.createdAt).toLocaleDateString('pt-BR')}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right">
-                            <a
-                              href={`/carrinho/${cart.uid}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              <ExternalLink className="w-5 h-5 inline" />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+
+                {/* ── Mobile: cards ───────────────────────── */}
+                <div className="sm:hidden divide-y divide-gray-100">
+                  {carts.map((cart) => {
+                    const total = cart.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+                    return (
+                      <div key={cart.id} className="p-4">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-sm text-gray-900">{cart.customerName}</p>
+                            <p className="text-xs text-gray-500">{cart.phone}</p>
+                          </div>
+                          <a
+                            href={`/carrinho/${cart.uid}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-900 flex-shrink-0"
+                            title="Abrir carrinho"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-gray-500 gap-2">
+                          <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded truncate max-w-[120px]">
+                            {cart.uid}
+                          </span>
+                          <span className="font-semibold text-gray-900 text-sm">{fmtPrice(total)}</span>
+                          <span>{new Date(cart.createdAt).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* ── Desktop: tabela ─────────────────────── */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Link</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {carts.map((cart) => {
+                        const total = cart.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+                        return (
+                          <tr key={cart.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{cart.uid}</td>
+                            <td className="px-6 py-4 text-sm text-gray-900">{cart.customerName}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cart.phone}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{fmtPrice(total)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {new Date(cart.createdAt).toLocaleDateString('pt-BR')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <a
+                                href={`/carrinho/${cart.uid}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                <ExternalLink className="w-5 h-5 inline" />
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -635,16 +729,16 @@ export default function PainelAdmin() {
           </div>
         )}
 
-        {/* Tab: Configurações */}
+        {/* ════════════════ Tab: Configurações ════════════════ */}
         {activeTab === 'config' && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Configurações do Site</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Configurações do Site</h2>
 
             {loadingConfig ? (
               <Loading />
             ) : (
-              <div className="bg-white rounded-xl shadow p-6">
-                <form onSubmit={handleUpdateConfig} className="space-y-6">
+              <div className="bg-white rounded-xl shadow p-4 sm:p-6">
+                <form onSubmit={handleUpdateConfig} className="space-y-5 sm:space-y-6">
                   {/* Hero Image URL */}
                   <div>
                     <label htmlFor="heroImageUrl" className="block text-sm font-medium text-gray-700 mb-2">
@@ -656,10 +750,10 @@ export default function PainelAdmin() {
                       value={heroImageUrl}
                       onChange={(e) => setHeroImageUrl(e.target.value)}
                       placeholder="https://exemplo.com/imagem.jpg"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(254,0,0)] focus:border-transparent text-sm sm:text-base"
                       required
                     />
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-xs sm:text-sm text-gray-500">
                       Esta imagem aparecerá como fundo da seção Hero na página inicial (onde está escrito "40 Anos Encantando São Luís...")
                     </p>
                   </div>
@@ -670,7 +764,7 @@ export default function PainelAdmin() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Prévia da Imagem
                       </label>
-                      <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-300">
+                      <div className="relative w-full h-48 sm:h-64 rounded-lg overflow-hidden border border-gray-300">
                         <img
                           src={heroImageUrl}
                           alt="Preview"
@@ -682,7 +776,7 @@ export default function PainelAdmin() {
                         />
                       </div>
 
-                      <div className="mt-3 flex items-center gap-3">
+                      <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
                         <input
                           id="heroUploadInput"
                           type="file"
@@ -690,27 +784,32 @@ export default function PainelAdmin() {
                           onChange={handleHeroFileChange}
                           className="hidden"
                         />
-                        <label htmlFor="heroUploadInput" className="px-4 py-2 bg-gray-100 rounded-md cursor-pointer">
+                        <label
+                          htmlFor="heroUploadInput"
+                          className="w-full sm:w-auto text-center px-4 py-2 bg-gray-100 rounded-md cursor-pointer text-sm hover:bg-gray-200 transition-colors"
+                        >
                           Selecionar arquivo
                         </label>
                         <button
                           type="button"
                           onClick={() => document.getElementById('heroUploadInput')?.click()}
                           disabled={uploadingHero}
-                          className="px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors"
+                          className="w-full sm:w-auto px-4 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors text-sm disabled:opacity-60"
                         >
                           {uploadingHero ? 'Enviando...' : 'Enviar Imagem'}
                         </button>
-                        <p className="text-sm text-gray-500">ou cole a URL acima e clique em Salvar Configurações</p>
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          ou cole a URL acima e clique em Salvar
+                        </p>
                       </div>
                     </div>
                   )}
 
-                  {/* Submit Button */}
-                  <div className="flex justify-end">
+                  {/* Submit */}
+                  <div className="flex justify-end pt-2">
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors font-medium"
+                      className="w-full sm:w-auto px-6 py-2.5 bg-[rgb(254,0,0)] text-white rounded-lg hover:bg-[rgb(220,0,0)] transition-colors font-medium text-sm sm:text-base"
                     >
                       Salvar Configurações
                     </button>
@@ -722,16 +821,13 @@ export default function PainelAdmin() {
         )}
       </div>
 
-      {/* Modals */}
+      {/* ── Modals ─────────────────────────────────────────────────────────── */}
       {showProductForm && (
         <ProductForm
           product={editingProduct}
           categories={categories}
           onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct}
-          onClose={() => {
-            setShowProductForm(false);
-            setEditingProduct(undefined);
-          }}
+          onClose={() => { setShowProductForm(false); setEditingProduct(undefined); }}
         />
       )}
 
@@ -739,23 +835,15 @@ export default function PainelAdmin() {
         <CategoryForm
           category={editingCategory}
           onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}
-          onClose={() => {
-            setShowCategoryForm(false);
-            setEditingCategory(undefined);
-          }}
+          onClose={() => { setShowCategoryForm(false); setEditingCategory(undefined); }}
         />
       )}
 
       {showProductImages && managingImagesProduct && (
         <ProductImagesModal
           product={managingImagesProduct}
-          onClose={() => {
-            setShowProductImages(false);
-            setManagingImagesProduct(undefined);
-          }}
-          onUpdate={() => {
-            loadProducts();
-          }}
+          onClose={() => { setShowProductImages(false); setManagingImagesProduct(undefined); }}
+          onUpdate={() => { loadProducts(); }}
         />
       )}
     </div>

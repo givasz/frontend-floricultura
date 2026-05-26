@@ -36,7 +36,7 @@ export default function CTASection() {
         <div className="flex flex-wrap items-center justify-center gap-3 lg:gap-6 text-base lg:text-lg opacity-90">
           <span>✓ Entrega no Mesmo Dia</span>
           <span className="hidden sm:inline">|</span>
-          <span>✓ 39 Anos de Tradição</span>
+          <span>✓ 40 Anos de Tradição</span>
           <span className="hidden sm:inline">|</span>
           <span>✓ +500 Produtos</span>
         </div>

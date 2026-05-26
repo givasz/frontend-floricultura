@@ -2,7 +2,7 @@ export default function BenefitsBar() {
   const benefits = [
     {
       icon: '🏆',
-      title: '39 Anos de Tradição',
+      title: '40 Anos de Tradição',
       text: 'A floricultura mais antiga de São Luís em atividade'
     },
     {
